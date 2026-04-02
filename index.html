@@ -1,1 +1,1817 @@
+<!DOCTYPE html>
 
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Done — Home Maintenance, Simplified</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+–bg: #0e0e0e;
+–surface: #171717;
+–surface2: #202020;
+–border: #2a2a2a;
+–text: #f0ede8;
+–muted: #666;
+–accent: #e8d5a3;
+–accent2: #c4a96b;
+–danger: #e05c5c;
+–ok: #6fc78a;
+–warn: #e8a84a;
+–record: #e05c5c;
+–record-glow: rgba(224, 92, 92, 0.35);
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html { scroll-behavior: smooth; }
+
+body {
+font-family: ‘DM Sans’, sans-serif;
+background: var(–bg);
+color: var(–text);
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* ─── NOISE OVERLAY ─── */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘1’/%3E%3C/svg%3E”);
+opacity: 0.025;
+pointer-events: none;
+z-index: 0;
+}
+
+/* ─── SCREENS ─── */
+.screen {
+display: none;
+flex-direction: column;
+min-height: 100vh;
+position: relative;
+z-index: 1;
+}
+.screen.active { display: flex; }
+
+/* ══════════════════════════════════════
+LANDING SCREEN
+══════════════════════════════════════ */
+#screen-landing {
+padding: 0;
+}
+
+.landing-hero {
+padding: 64px 28px 48px;
+display: flex;
+flex-direction: column;
+gap: 0;
+}
+
+.landing-eyebrow {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+font-weight: 400;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: var(–accent2);
+margin-bottom: 20px;
+}
+
+.landing-title {
+font-family: ‘Syne’, sans-serif;
+font-size: clamp(52px, 14vw, 80px);
+font-weight: 800;
+line-height: 0.92;
+letter-spacing: -0.03em;
+color: var(–text);
+margin-bottom: 24px;
+}
+
+.landing-title span {
+color: var(–accent);
+display: block;
+}
+
+.landing-tagline {
+font-family: ‘DM Mono’, monospace;
+font-size: 13px;
+font-weight: 300;
+color: var(–muted);
+line-height: 1.7;
+max-width: 340px;
+margin-bottom: 40px;
+}
+
+.landing-tagline strong {
+color: var(–text);
+font-weight: 500;
+}
+
+.btn-primary {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+background: var(–accent);
+color: #0e0e0e;
+font-family: ‘Syne’, sans-serif;
+font-size: 15px;
+font-weight: 700;
+letter-spacing: 0.02em;
+padding: 18px 32px;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+width: 100%;
+max-width: 320px;
+transition: transform 0.15s, background 0.15s;
+position: relative;
+overflow: hidden;
+}
+
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:hover { background: #f0e0b0; }
+
+.btn-primary .arrow {
+font-size: 18px;
+transition: transform 0.2s;
+}
+.btn-primary:hover .arrow { transform: translateX(4px); }
+
+/* divider */
+.landing-divider {
+height: 1px;
+background: var(–border);
+margin: 0 28px;
+}
+
+/* how it works */
+.landing-section {
+padding: 48px 28px;
+}
+
+.section-label {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 28px;
+}
+
+.steps-list {
+display: flex;
+flex-direction: column;
+gap: 24px;
+}
+
+.step {
+display: flex;
+gap: 20px;
+align-items: flex-start;
+}
+
+.step-num {
+font-family: ‘Syne’, sans-serif;
+font-size: 11px;
+font-weight: 700;
+color: var(–accent2);
+background: var(–surface);
+border: 1px solid var(–border);
+width: 28px;
+height: 28px;
+display: flex;
+align-items: center;
+justify-content: center;
+border-radius: 50%;
+flex-shrink: 0;
+margin-top: 1px;
+}
+
+.step-text {
+font-size: 14px;
+line-height: 1.6;
+color: var(–text);
+}
+
+.step-text em {
+font-style: normal;
+color: var(–muted);
+font-size: 12px;
+display: block;
+margin-top: 4px;
+}
+
+/* features grid */
+.features-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 12px;
+}
+
+.feature-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 18px 16px;
+}
+
+.feature-card:first-child {
+grid-column: 1 / -1;
+background: linear-gradient(135deg, var(–surface2) 0%, #1a1a14 100%);
+border-color: var(–accent2);
+}
+
+.feature-icon {
+font-size: 22px;
+margin-bottom: 10px;
+display: block;
+}
+
+.feature-title {
+font-family: ‘Syne’, sans-serif;
+font-size: 14px;
+font-weight: 700;
+color: var(–text);
+margin-bottom: 6px;
+}
+
+.feature-desc {
+font-size: 12px;
+line-height: 1.55;
+color: var(–muted);
+}
+
+/* CTA bottom */
+.landing-cta-bottom {
+padding: 40px 28px 60px;
+display: flex;
+flex-direction: column;
+gap: 16px;
+align-items: center;
+}
+
+.privacy-note {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+color: var(–muted);
+text-align: center;
+letter-spacing: 0.05em;
+line-height: 1.6;
+}
+
+/* ══════════════════════════════════════
+RECORD SCREEN
+══════════════════════════════════════ */
+#screen-record {
+align-items: center;
+justify-content: space-between;
+padding: 40px 28px 56px;
+background: radial-gradient(ellipse at 50% 60%, #1c1200 0%, var(–bg) 70%);
+}
+
+.record-header {
+width: 100%;
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+
+.back-btn {
+background: none;
+border: 1px solid var(–border);
+color: var(–muted);
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.1em;
+padding: 8px 14px;
+border-radius: 4px;
+cursor: pointer;
+transition: color 0.15s, border-color 0.15s;
+}
+.back-btn:hover { color: var(–text); border-color: var(–muted); }
+
+.record-screen-label {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.2em;
+color: var(–muted);
+text-transform: uppercase;
+}
+
+.record-center {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 36px;
+flex: 1;
+justify-content: center;
+}
+
+.record-instructions {
+font-family: ‘Syne’, sans-serif;
+font-size: 22px;
+font-weight: 700;
+color: var(–text);
+text-align: center;
+line-height: 1.3;
+max-width: 260px;
+}
+
+.record-instructions .sub {
+display: block;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 13px;
+font-weight: 400;
+color: var(–muted);
+margin-top: 8px;
+}
+
+/* waveform */
+.waveform-container {
+width: 100%;
+height: 56px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 3px;
+opacity: 0;
+transition: opacity 0.3s;
+}
+.waveform-container.active { opacity: 1; }
+
+.wave-bar {
+width: 3px;
+height: 6px;
+background: var(–accent);
+border-radius: 2px;
+animation: none;
+}
+
+.waveform-container.active .wave-bar {
+animation: wavePulse 0.6s ease-in-out infinite alternate;
+}
+
+.wave-bar:nth-child(1)  { animation-delay: 0.0s; }
+.wave-bar:nth-child(2)  { animation-delay: 0.05s; }
+.wave-bar:nth-child(3)  { animation-delay: 0.10s; }
+.wave-bar:nth-child(4)  { animation-delay: 0.15s; }
+.wave-bar:nth-child(5)  { animation-delay: 0.20s; }
+.wave-bar:nth-child(6)  { animation-delay: 0.25s; }
+.wave-bar:nth-child(7)  { animation-delay: 0.30s; }
+.wave-bar:nth-child(8)  { animation-delay: 0.35s; }
+.wave-bar:nth-child(9)  { animation-delay: 0.40s; }
+.wave-bar:nth-child(10) { animation-delay: 0.45s; }
+.wave-bar:nth-child(11) { animation-delay: 0.50s; }
+.wave-bar:nth-child(12) { animation-delay: 0.45s; }
+.wave-bar:nth-child(13) { animation-delay: 0.40s; }
+.wave-bar:nth-child(14) { animation-delay: 0.35s; }
+.wave-bar:nth-child(15) { animation-delay: 0.30s; }
+.wave-bar:nth-child(16) { animation-delay: 0.25s; }
+.wave-bar:nth-child(17) { animation-delay: 0.20s; }
+.wave-bar:nth-child(18) { animation-delay: 0.15s; }
+.wave-bar:nth-child(19) { animation-delay: 0.10s; }
+.wave-bar:nth-child(20) { animation-delay: 0.05s; }
+
+@keyframes wavePulse {
+0%   { height: 4px; opacity: 0.3; }
+100% { height: var(–peak, 32px); opacity: 1; }
+}
+
+/* THE BUTTON */
+.record-btn-wrap {
+position: relative;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.record-ring {
+position: absolute;
+width: 140px;
+height: 140px;
+border-radius: 50%;
+border: 1px solid var(–record-glow);
+animation: ringPulse 2.5s ease-in-out infinite;
+opacity: 0;
+transition: opacity 0.3s;
+}
+
+.record-ring:nth-child(2) { animation-delay: 0.8s; }
+.record-ring:nth-child(3) { animation-delay: 1.6s; }
+
+.record-btn-wrap.recording .record-ring { opacity: 1; }
+
+@keyframes ringPulse {
+0%   { transform: scale(1); opacity: 0.6; }
+100% { transform: scale(2); opacity: 0; }
+}
+
+.record-btn {
+width: 100px;
+height: 100px;
+border-radius: 50%;
+border: none;
+background: var(–record);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+position: relative;
+z-index: 2;
+box-shadow: 0 0 0 0 var(–record-glow);
+transition: transform 0.15s, box-shadow 0.3s;
+-webkit-user-select: none;
+user-select: none;
+}
+
+.record-btn:active,
+.record-btn.recording {
+transform: scale(0.93);
+box-shadow: 0 0 40px 16px var(–record-glow);
+}
+
+.record-btn-inner {
+width: 36px;
+height: 36px;
+background: white;
+border-radius: 50%;
+transition: border-radius 0.2s, width 0.2s, height 0.2s;
+}
+
+.record-btn.recording .record-btn-inner {
+border-radius: 6px;
+width: 28px;
+height: 28px;
+}
+
+.record-timer {
+font-family: ‘DM Mono’, monospace;
+font-size: 14px;
+color: var(–muted);
+letter-spacing: 0.1em;
+min-height: 20px;
+}
+
+/* transcript preview */
+.transcript-preview {
+width: 100%;
+min-height: 52px;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 14px 16px;
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+color: var(–muted);
+line-height: 1.6;
+font-style: italic;
+display: none;
+}
+
+.transcript-preview.visible { display: block; }
+.transcript-preview.has-text {
+color: var(–text);
+font-style: normal;
+}
+
+.record-hint {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: var(–muted);
+text-align: center;
+letter-spacing: 0.05em;
+line-height: 1.6;
+}
+
+/* ══════════════════════════════════════
+PROCESSING SCREEN
+══════════════════════════════════════ */
+#screen-processing {
+align-items: center;
+justify-content: center;
+gap: 32px;
+background: radial-gradient(ellipse at 50% 50%, #111400 0%, var(–bg) 70%);
+}
+
+.processing-orb {
+width: 80px;
+height: 80px;
+border-radius: 50%;
+background: conic-gradient(from 0deg, var(–accent2), var(–accent), transparent, var(–accent2));
+animation: orbSpin 1.4s linear infinite;
+position: relative;
+}
+
+.processing-orb::after {
+content: ‘’;
+position: absolute;
+inset: 6px;
+background: #111400;
+border-radius: 50%;
+}
+
+@keyframes orbSpin {
+to { transform: rotate(360deg); }
+}
+
+.processing-label {
+font-family: ‘Syne’, sans-serif;
+font-size: 20px;
+font-weight: 700;
+color: var(–text);
+text-align: center;
+}
+
+.processing-steps {
+display: flex;
+flex-direction: column;
+gap: 10px;
+align-items: center;
+}
+
+.proc-step {
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+color: var(–muted);
+letter-spacing: 0.06em;
+display: flex;
+align-items: center;
+gap: 10px;
+opacity: 0;
+transition: opacity 0.4s;
+}
+.proc-step.visible { opacity: 1; }
+.proc-step.done { color: var(–ok); }
+.proc-step .dot {
+width: 6px;
+height: 6px;
+border-radius: 50%;
+background: currentColor;
+flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════
+TASK LIST SCREEN
+══════════════════════════════════════ */
+#screen-tasks {
+padding: 0;
+}
+
+.tasks-header {
+padding: 44px 24px 20px;
+border-bottom: 1px solid var(–border);
+position: sticky;
+top: 0;
+background: var(–bg);
+z-index: 10;
+}
+
+.tasks-header-top {
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+margin-bottom: 16px;
+}
+
+.tasks-title {
+font-family: ‘Syne’, sans-serif;
+font-size: 28px;
+font-weight: 800;
+color: var(–text);
+line-height: 1;
+}
+
+.tasks-title span {
+display: block;
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+font-weight: 400;
+color: var(–muted);
+letter-spacing: 0.1em;
+margin-bottom: 6px;
+}
+
+.add-task-btn {
+background: var(–accent);
+border: none;
+color: #0e0e0e;
+font-family: ‘Syne’, sans-serif;
+font-size: 22px;
+font-weight: 700;
+width: 44px;
+height: 44px;
+border-radius: 50%;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+margin-top: 4px;
+transition: transform 0.15s;
+}
+.add-task-btn:active { transform: scale(0.9); }
+
+/* summary pills */
+.summary-pills {
+display: flex;
+gap: 8px;
+overflow-x: auto;
+padding-bottom: 4px;
+scrollbar-width: none;
+}
+.summary-pills::-webkit-scrollbar { display: none; }
+
+.pill {
+display: flex;
+align-items: center;
+gap: 6px;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 100px;
+padding: 6px 12px;
+white-space: nowrap;
+cursor: pointer;
+transition: border-color 0.15s;
+}
+.pill.active { border-color: var(–accent2); }
+.pill-dot {
+width: 7px;
+height: 7px;
+border-radius: 50%;
+}
+.pill-label {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.08em;
+color: var(–muted);
+}
+.pill.active .pill-label { color: var(–text); }
+.pill-count {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+color: var(–accent2);
+}
+
+/* task list */
+.tasks-list {
+padding: 16px 16px 100px;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.task-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 16px;
+cursor: pointer;
+transition: border-color 0.2s, transform 0.15s;
+animation: cardIn 0.35s ease both;
+}
+
+@keyframes cardIn {
+from { opacity: 0; transform: translateY(12px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+.task-card:active { transform: scale(0.98); }
+.task-card:hover { border-color: #3a3a3a; }
+
+.task-card-top {
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+gap: 10px;
+margin-bottom: 8px;
+}
+
+.task-name {
+font-family: ‘Syne’, sans-serif;
+font-size: 15px;
+font-weight: 700;
+color: var(–text);
+line-height: 1.3;
+flex: 1;
+}
+
+.urgency-badge {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.08em;
+font-weight: 500;
+padding: 4px 9px;
+border-radius: 100px;
+white-space: nowrap;
+flex-shrink: 0;
+}
+
+.urgency-1, .urgency-2 { background: rgba(111,199,138,0.12); color: var(–ok); }
+.urgency-3             { background: rgba(232,168,74,0.12);  color: var(–warn); }
+.urgency-4, .urgency-5 { background: rgba(224,92,92,0.12);   color: var(–danger); }
+
+.task-meta {
+display: flex;
+align-items: center;
+gap: 12px;
+flex-wrap: wrap;
+}
+
+.task-meta-item {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: var(–muted);
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+.task-type-badge {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.06em;
+padding: 3px 8px;
+border-radius: 4px;
+border: 1px solid var(–border);
+color: var(–muted);
+}
+
+/* empty state */
+.empty-state {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 80px 40px;
+gap: 16px;
+text-align: center;
+}
+
+.empty-icon {
+font-size: 48px;
+opacity: 0.4;
+}
+
+.empty-title {
+font-family: ‘Syne’, sans-serif;
+font-size: 18px;
+font-weight: 700;
+color: var(–muted);
+}
+
+.empty-sub {
+font-size: 13px;
+color: var(–muted);
+opacity: 0.6;
+line-height: 1.6;
+}
+
+/* FAB */
+.fab {
+position: fixed;
+bottom: 28px;
+left: 50%;
+transform: translateX(-50%);
+background: var(–accent);
+color: #0e0e0e;
+border: none;
+font-family: ‘Syne’, sans-serif;
+font-size: 14px;
+font-weight: 700;
+padding: 16px 32px;
+border-radius: 100px;
+cursor: pointer;
+box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(232,213,163,0.15);
+display: flex;
+align-items: center;
+gap: 10px;
+z-index: 20;
+white-space: nowrap;
+transition: transform 0.15s, box-shadow 0.15s;
+}
+.fab:active { transform: translateX(-50%) scale(0.95); }
+
+/* ══════════════════════════════════════
+TASK DETAIL SCREEN
+══════════════════════════════════════ */
+#screen-detail {
+padding: 0;
+overflow-y: auto;
+}
+
+.detail-header {
+padding: 44px 24px 24px;
+border-bottom: 1px solid var(–border);
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+gap: 16px;
+}
+
+.detail-back {
+background: none;
+border: none;
+color: var(–accent2);
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+cursor: pointer;
+padding: 0;
+letter-spacing: 0.05em;
+display: flex;
+align-items: center;
+gap: 6px;
+flex-shrink: 0;
+margin-top: 2px;
+}
+
+.detail-title-block { flex: 1; }
+
+.detail-title {
+font-family: ‘Syne’, sans-serif;
+font-size: 22px;
+font-weight: 800;
+color: var(–text);
+line-height: 1.2;
+margin-bottom: 12px;
+}
+
+.detail-badges {
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
+}
+
+/* sections */
+.detail-body {
+padding: 24px;
+display: flex;
+flex-direction: column;
+gap: 24px;
+padding-bottom: 40px;
+}
+
+.detail-section {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 18px;
+}
+
+.detail-section-label {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: var(–accent2);
+margin-bottom: 12px;
+}
+
+.detail-section-content {
+font-size: 14px;
+line-height: 1.7;
+color: var(–text);
+}
+
+.detail-steps {
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+
+.detail-step {
+display: flex;
+gap: 14px;
+align-items: flex-start;
+}
+
+.detail-step-num {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: var(–accent2);
+background: var(–surface2);
+border: 1px solid var(–border);
+width: 24px;
+height: 24px;
+display: flex;
+align-items: center;
+justify-content: center;
+border-radius: 50%;
+flex-shrink: 0;
+margin-top: 1px;
+}
+
+.detail-step-text {
+font-size: 13px;
+line-height: 1.6;
+color: var(–text);
+}
+
+/* cost bar */
+.cost-display {
+display: flex;
+align-items: baseline;
+gap: 8px;
+}
+
+.cost-amount {
+font-family: ‘Syne’, sans-serif;
+font-size: 28px;
+font-weight: 800;
+color: var(–accent);
+}
+
+.cost-label {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: var(–muted);
+}
+
+/* action buttons */
+.detail-actions {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.action-btn {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+padding: 16px;
+border-radius: 8px;
+font-family: ‘Syne’, sans-serif;
+font-size: 14px;
+font-weight: 700;
+cursor: pointer;
+border: none;
+transition: transform 0.15s, opacity 0.15s;
+}
+.action-btn:active { transform: scale(0.97); }
+
+.action-btn.primary {
+background: var(–accent);
+color: #0e0e0e;
+}
+
+.action-btn.secondary {
+background: var(–surface);
+border: 1px solid var(–border);
+color: var(–text);
+}
+
+.action-btn.danger {
+background: rgba(224,92,92,0.08);
+border: 1px solid rgba(224,92,92,0.3);
+color: var(–danger);
+}
+
+/* rfq modal */
+.modal-overlay {
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.8);
+z-index: 100;
+display: none;
+align-items: flex-end;
+padding: 0;
+}
+.modal-overlay.open { display: flex; }
+
+.modal-sheet {
+width: 100%;
+background: var(–surface);
+border-top: 1px solid var(–border);
+border-radius: 20px 20px 0 0;
+padding: 28px 24px 48px;
+animation: sheetUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+max-height: 85vh;
+overflow-y: auto;
+}
+
+@keyframes sheetUp {
+from { transform: translateY(100%); }
+to   { transform: translateY(0); }
+}
+
+.sheet-handle {
+width: 36px;
+height: 4px;
+background: var(–border);
+border-radius: 2px;
+margin: 0 auto 24px;
+}
+
+.sheet-title {
+font-family: ‘Syne’, sans-serif;
+font-size: 20px;
+font-weight: 800;
+color: var(–text);
+margin-bottom: 6px;
+}
+
+.sheet-sub {
+font-size: 13px;
+color: var(–muted);
+margin-bottom: 24px;
+line-height: 1.5;
+}
+
+.rfq-box {
+background: var(–bg);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 16px;
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+line-height: 1.8;
+color: var(–text);
+white-space: pre-wrap;
+margin-bottom: 16px;
+word-break: break-word;
+}
+
+.copy-btn {
+width: 100%;
+padding: 14px;
+background: var(–accent);
+color: #0e0e0e;
+border: none;
+border-radius: 8px;
+font-family: ‘Syne’, sans-serif;
+font-size: 14px;
+font-weight: 700;
+cursor: pointer;
+transition: transform 0.15s;
+}
+.copy-btn:active { transform: scale(0.97); }
+
+/* ─── transcript input fallback ─── */
+.text-input-wrap {
+width: 100%;
+display: none;
+}
+.text-input-wrap.visible { display: block; }
+
+.text-input {
+width: 100%;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 14px 16px;
+font-family: ‘DM Sans’, sans-serif;
+font-size: 14px;
+color: var(–text);
+resize: none;
+min-height: 80px;
+outline: none;
+line-height: 1.6;
+}
+.text-input:focus { border-color: var(–accent2); }
+.text-input::placeholder { color: var(–muted); }
+
+.submit-text-btn {
+margin-top: 10px;
+width: 100%;
+padding: 14px;
+background: var(–record);
+color: white;
+border: none;
+border-radius: 8px;
+font-family: ‘Syne’, sans-serif;
+font-size: 14px;
+font-weight: 700;
+cursor: pointer;
+transition: transform 0.15s;
+}
+.submit-text-btn:active { transform: scale(0.97); }
+
+/* toast */
+.toast {
+position: fixed;
+bottom: 100px;
+left: 50%;
+transform: translateX(-50%) translateY(20px);
+background: var(–ok);
+color: #0e0e0e;
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+font-weight: 500;
+padding: 10px 20px;
+border-radius: 100px;
+opacity: 0;
+transition: opacity 0.2s, transform 0.2s;
+pointer-events: none;
+z-index: 200;
+white-space: nowrap;
+}
+.toast.show {
+opacity: 1;
+transform: translateX(-50%) translateY(0);
+}
+</style>
+
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     LANDING SCREEN
+══════════════════════════════ -->
+
+<div class="screen active" id="screen-landing">
+  <div class="landing-hero">
+    <div class="landing-eyebrow">Home Maintenance, Simplified</div>
+    <h1 class="landing-title">Done.<span>Finally.</span></h1>
+    <p class="landing-tagline">
+      <strong>Point. Speak. Done.</strong><br>
+      Turn home repair chaos into a clean, prioritized, executable plan — in one tap.
+    </p>
+    <button class="btn-primary" onclick="showScreen('screen-record')">
+      Try the Demo <span class="arrow">→</span>
+    </button>
+  </div>
+
+  <div class="landing-divider"></div>
+
+  <div class="landing-section">
+    <div class="section-label">How it works</div>
+    <div class="steps-list">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          Hold the record button and describe your problem out loud.
+          <em>No forms. No typing. Just speak.</em>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          AI instantly diagnoses the issue and adds it to your task list.
+          <em>Urgency, cost estimate, DIY or hire — all automatic.</em>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          Choose your path: fix it yourself, defer it, or generate a full contractor RFQ in one tap.
+          <em>Your home, your call.</em>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="landing-divider"></div>
+
+  <div class="landing-section">
+    <div class="section-label">What you get</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🧠</span>
+        <div class="feature-title">AI Diagnosis</div>
+        <div class="feature-desc">Describes the issue, identifies root causes, flags safety risks, and estimates realistic repair costs — automatically.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📋</span>
+        <div class="feature-title">Living Task List</div>
+        <div class="feature-desc">Every repair, ranked by urgency. Never forget a job again.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔨</span>
+        <div class="feature-title">DIY Guides</div>
+        <div class="feature-desc">Clear step-by-step instructions written for your specific issue.</div>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📤</span>
+        <div class="feature-title">Contractor RFQ</div>
+        <div class="feature-desc">One tap generates a complete job brief — ready to send.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="landing-cta-bottom">
+    <button class="btn-primary" onclick="showScreen('screen-record')">
+      Start Your Home Log <span class="arrow">→</span>
+    </button>
+    <p class="privacy-note">No account needed to try. Voice data processed locally.<br>Your repairs stay on your device.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     RECORD SCREEN
+══════════════════════════════ -->
+
+<div class="screen" id="screen-record">
+  <div class="record-header">
+    <button class="back-btn" onclick="showScreen('screen-landing')">← Back</button>
+    <div class="record-screen-label">New Issue</div>
+    <div style="width:64px"></div>
+  </div>
+
+  <div class="record-center">
+    <div class="record-instructions" id="record-instructions">
+      What's the problem?
+      <span class="sub">Hold the button and describe it out loud</span>
+    </div>
+
+```
+<!-- waveform -->
+<div class="waveform-container" id="waveform">
+  <div class="wave-bar" style="--peak:18px"></div>
+  <div class="wave-bar" style="--peak:28px"></div>
+  <div class="wave-bar" style="--peak:38px"></div>
+  <div class="wave-bar" style="--peak:48px"></div>
+  <div class="wave-bar" style="--peak:32px"></div>
+  <div class="wave-bar" style="--peak:52px"></div>
+  <div class="wave-bar" style="--peak:44px"></div>
+  <div class="wave-bar" style="--peak:36px"></div>
+  <div class="wave-bar" style="--peak:52px"></div>
+  <div class="wave-bar" style="--peak:46px"></div>
+  <div class="wave-bar" style="--peak:52px"></div>
+  <div class="wave-bar" style="--peak:46px"></div>
+  <div class="wave-bar" style="--peak:52px"></div>
+  <div class="wave-bar" style="--peak:36px"></div>
+  <div class="wave-bar" style="--peak:44px"></div>
+  <div class="wave-bar" style="--peak:52px"></div>
+  <div class="wave-bar" style="--peak:32px"></div>
+  <div class="wave-bar" style="--peak:48px"></div>
+  <div class="wave-bar" style="--peak:38px"></div>
+  <div class="wave-bar" style="--peak:28px"></div>
+  <div class="wave-bar" style="--peak:18px"></div>
+</div>
+
+<!-- big record button -->
+<div class="record-btn-wrap" id="record-btn-wrap">
+  <div class="record-ring"></div>
+  <div class="record-ring"></div>
+  <div class="record-ring"></div>
+  <button
+    class="record-btn"
+    id="record-btn"
+    ontouchstart="startRecording(event)"
+    ontouchend="stopRecording(event)"
+    onmousedown="startRecording(event)"
+    onmouseup="stopRecording(event)"
+  >
+    <div class="record-btn-inner"></div>
+  </button>
+</div>
+
+<div class="record-timer" id="record-timer"></div>
+
+<!-- text transcript live preview -->
+<div class="transcript-preview" id="transcript-preview">Listening...</div>
+
+<!-- fallback text input -->
+<div class="text-input-wrap" id="text-input-wrap">
+  <textarea
+    class="text-input"
+    id="text-input"
+    placeholder="Describe the issue here… e.g. 'The bathroom faucet drips constantly and the handle is loose'"
+    rows="3"
+  ></textarea>
+  <button class="submit-text-btn" onclick="submitText()">Diagnose Issue →</button>
+</div>
+```
+
+  </div>
+
+  <div class="record-hint" id="record-hint">
+    Hold to speak &nbsp;·&nbsp; Release to process
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PROCESSING SCREEN
+══════════════════════════════ -->
+
+<div class="screen" id="screen-processing">
+  <div class="processing-orb"></div>
+  <div class="processing-label">Diagnosing issue…</div>
+  <div class="processing-steps">
+    <div class="proc-step" id="proc-1"><div class="dot"></div>Analyzing description</div>
+    <div class="proc-step" id="proc-2"><div class="dot"></div>Identifying root causes</div>
+    <div class="proc-step" id="proc-3"><div class="dot"></div>Estimating cost & urgency</div>
+    <div class="proc-step" id="proc-4"><div class="dot"></div>Building repair plan</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     TASK LIST SCREEN
+══════════════════════════════ -->
+
+<div class="screen" id="screen-tasks">
+  <div class="tasks-header">
+    <div class="tasks-header-top">
+      <div class="tasks-title">
+        <span>Your Property</span>
+        Home Tasks
+      </div>
+      <button class="add-task-btn" onclick="showScreen('screen-record')" title="Add new issue">+</button>
+    </div>
+    <div class="summary-pills" id="filter-pills">
+      <div class="pill active" data-filter="all" onclick="filterTasks('all', this)">
+        <div class="pill-dot" style="background:#666"></div>
+        <span class="pill-label">ALL</span>
+        <span class="pill-count" id="count-all">0</span>
+      </div>
+      <div class="pill" data-filter="urgent" onclick="filterTasks('urgent', this)">
+        <div class="pill-dot" style="background:var(--danger)"></div>
+        <span class="pill-label">URGENT</span>
+        <span class="pill-count" id="count-urgent">0</span>
+      </div>
+      <div class="pill" data-filter="soon" onclick="filterTasks('soon', this)">
+        <div class="pill-dot" style="background:var(--warn)"></div>
+        <span class="pill-label">SOON</span>
+        <span class="pill-count" id="count-soon">0</span>
+      </div>
+      <div class="pill" data-filter="low" onclick="filterTasks('low', this)">
+        <div class="pill-dot" style="background:var(--ok)"></div>
+        <span class="pill-label">LOW</span>
+        <span class="pill-count" id="count-low">0</span>
+      </div>
+    </div>
+  </div>
+  <div class="tasks-list" id="tasks-list"></div>
+  <button class="fab" onclick="showScreen('screen-record')">
+    ⏺ Report New Issue
+  </button>
+</div>
+
+<!-- ══════════════════════════════
+     TASK DETAIL SCREEN
+══════════════════════════════ -->
+
+<div class="screen" id="screen-detail">
+  <div class="detail-header">
+    <button class="detail-back" onclick="showScreen('screen-tasks')">← Tasks</button>
+    <div class="detail-title-block">
+      <div class="detail-title" id="detail-title"></div>
+      <div class="detail-badges" id="detail-badges"></div>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div class="detail-section">
+      <div class="detail-section-label">Diagnosis</div>
+      <div class="detail-section-content" id="detail-diagnosis"></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-label">Estimated Cost</div>
+      <div class="cost-display">
+        <div class="cost-amount" id="detail-cost"></div>
+        <div class="cost-label" id="detail-cost-label"></div>
+      </div>
+    </div>
+    <div class="detail-section" id="detail-steps-section">
+      <div class="detail-section-label">If DIY — Steps</div>
+      <div class="detail-steps" id="detail-steps"></div>
+    </div>
+    <div class="detail-actions">
+      <button class="action-btn primary" onclick="generateRFQ()">📤 Generate Contractor RFQ</button>
+      <button class="action-btn secondary" onclick="markDone()">✓ Mark as Done</button>
+      <button class="action-btn danger" onclick="deleteTask()">Remove Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     RFQ MODAL
+══════════════════════════════ -->
+
+<div class="modal-overlay" id="rfq-modal" onclick="closeModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Contractor Request for Quote</div>
+    <p class="sheet-sub">Copy this and paste it into your preferred messaging or email app to send to local contractors.</p>
+    <div class="rfq-box" id="rfq-content"></div>
+    <button class="copy-btn" onclick="copyRFQ()">Copy to Clipboard</button>
+  </div>
+</div>
+
+<!-- Toast -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let tasks = JSON.parse(localStorage.getItem('done_tasks') || '[]');
+let currentFilter = 'all';
+let activeTaskId = null;
+let recognition = null;
+let isRecording = false;
+let recordTimer = null;
+let recordSeconds = 0;
+let finalTranscript = '';
+let speechSupported = false;
+
+// ═══════════════════════════════════════
+// SCREEN NAVIGATION
+// ═══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'screen-tasks') renderTaskList();
+  if (id === 'screen-record') resetRecord();
+}
+
+// ═══════════════════════════════════════
+// SPEECH RECOGNITION SETUP
+// ═══════════════════════════════════════
+function setupSpeech() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    document.getElementById('text-input-wrap').classList.add('visible');
+    document.getElementById('record-hint').textContent = 'Voice not supported — type your issue below';
+    return;
+  }
+  speechSupported = true;
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    finalTranscript = '';
+    for (let i = 0; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalTranscript += t + ' ';
+      else interim += t;
+    }
+    const preview = document.getElementById('transcript-preview');
+    const display = (finalTranscript + interim).trim();
+    if (display) {
+      preview.textContent = display;
+      preview.classList.add('has-text');
+    }
+  };
+
+  recognition.onerror = (e) => {
+    console.warn('Speech error:', e.error);
+    if (e.error === 'not-allowed') {
+      document.getElementById('text-input-wrap').classList.add('visible');
+      document.getElementById('record-hint').textContent = 'Mic not available — type your issue below';
+    }
+  };
+}
+
+// ═══════════════════════════════════════
+// RECORDING
+// ═══════════════════════════════════════
+function startRecording(e) {
+  e.preventDefault();
+  if (isRecording) return;
+  isRecording = true;
+  finalTranscript = '';
+
+  const btn = document.getElementById('record-btn');
+  const wrap = document.getElementById('record-btn-wrap');
+  const waveform = document.getElementById('waveform');
+  const preview = document.getElementById('transcript-preview');
+  const instructions = document.getElementById('record-instructions');
+
+  btn.classList.add('recording');
+  wrap.classList.add('recording');
+  waveform.classList.add('active');
+  preview.classList.add('visible');
+  preview.classList.remove('has-text');
+  preview.textContent = 'Listening…';
+  instructions.innerHTML = 'Listening…<span class="sub">Release when done</span>';
+
+  if (speechSupported && recognition) {
+    try { recognition.start(); } catch(err) {}
+  }
+
+  recordSeconds = 0;
+  updateTimer();
+  recordTimer = setInterval(() => {
+    recordSeconds++;
+    updateTimer();
+    if (recordSeconds >= 60) stopRecording(e);
+  }, 1000);
+}
+
+function stopRecording(e) {
+  if (e) e.preventDefault();
+  if (!isRecording) return;
+  isRecording = false;
+
+  const btn = document.getElementById('record-btn');
+  const wrap = document.getElementById('record-btn-wrap');
+  const waveform = document.getElementById('waveform');
+
+  btn.classList.remove('recording');
+  wrap.classList.remove('recording');
+  waveform.classList.remove('active');
+  clearInterval(recordTimer);
+  document.getElementById('record-timer').textContent = '';
+
+  if (speechSupported && recognition) {
+    try { recognition.stop(); } catch(err) {}
+  }
+
+  const transcript = finalTranscript.trim();
+  if (transcript.length > 3) {
+    processTranscript(transcript);
+  } else {
+    // no transcript — show text fallback
+    document.getElementById('text-input-wrap').classList.add('visible');
+    document.getElementById('record-instructions').innerHTML = 'What\'s the problem?<span class="sub">Type it below instead</span>';
+    document.getElementById('transcript-preview').classList.remove('visible');
+  }
+}
+
+function updateTimer() {
+  const m = Math.floor(recordSeconds / 60).toString().padStart(2,'0');
+  const s = (recordSeconds % 60).toString().padStart(2,'0');
+  document.getElementById('record-timer').textContent = `${m}:${s}`;
+}
+
+function resetRecord() {
+  isRecording = false;
+  finalTranscript = '';
+  clearInterval(recordTimer);
+  document.getElementById('record-btn').classList.remove('recording');
+  document.getElementById('record-btn-wrap').classList.remove('recording');
+  document.getElementById('waveform').classList.remove('active');
+  document.getElementById('record-timer').textContent = '';
+  document.getElementById('transcript-preview').className = 'transcript-preview';
+  document.getElementById('transcript-preview').textContent = 'Listening…';
+  document.getElementById('text-input-wrap').classList.remove('visible');
+  document.getElementById('text-input').value = '';
+  document.getElementById('record-instructions').innerHTML = 'What\'s the problem?<span class="sub">Hold the button and describe it out loud</span>';
+  document.getElementById('record-hint').textContent = 'Hold to speak · Release to process';
+}
+
+function submitText() {
+  const text = document.getElementById('text-input').value.trim();
+  if (text.length < 5) { showToast('Please describe the issue first'); return; }
+  processTranscript(text);
+}
+
+// ═══════════════════════════════════════
+// CLAUDE API
+// ═══════════════════════════════════════
+async function processTranscript(transcript) {
+  showScreen('screen-processing');
+  animateProcessingSteps();
+
+  const prompt = `You are a home maintenance AI assistant. A homeowner has described a problem in their home.
+
+Their description: "${transcript}"
+
+Analyze this and respond ONLY with a valid JSON object. No preamble, no markdown, no explanation. Just the raw JSON object.
+
+The JSON must have exactly these fields:
+{
+  "title": "Short issue name (5 words max)",
+  "urgency": <number 1-5, where 5 is most urgent>,
+  "urgency_label": "One of: Low Priority / Monitor Soon / Address Soon / Urgent / Emergency",
+  "type": "One of: DIY / Hire Out / Either",
+  "diagnosis": "2-3 sentence plain English explanation of the problem and likely causes.",
+  "cost_min": <integer dollar amount, no decimals>,
+  "cost_max": <integer dollar amount>,
+  "cost_note": "Short note on cost range e.g. 'DIY materials only' or 'Licensed plumber required'",
+  "steps": ["Step 1 text", "Step 2 text", "Step 3 text"],
+  "safety_flag": true or false
+}`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content?.map(b => b.text || '').join('').trim();
+
+    // strip any markdown fences just in case
+    const clean = raw.replace(/```json|```/gi, '').trim();
+    const result = JSON.parse(clean);
+    result.id = Date.now().toString();
+    result.transcript = transcript;
+    result.date = new Date().toLocaleDateString('en-CA');
+
+    tasks.unshift(result);
+    saveTasks();
+    activeTaskId = result.id;
+
+    setTimeout(() => {
+      showScreen('screen-tasks');
+      setTimeout(() => openDetail(result.id), 300);
+    }, 600);
+
+  } catch (err) {
+    console.error('Claude error:', err);
+    showScreen('screen-record');
+    showToast('Could not diagnose — please try again');
+  }
+}
+
+function animateProcessingSteps() {
+  const steps = ['proc-1','proc-2','proc-3','proc-4'];
+  steps.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('visible','done');
+    setTimeout(() => {
+      el.classList.add('visible');
+      if (i > 0) document.getElementById(steps[i-1]).classList.add('done');
+    }, i * 700 + 200);
+  });
+}
+
+// ═══════════════════════════════════════
+// TASK LIST
+// ═══════════════════════════════════════
+function saveTasks() {
+  localStorage.setItem('done_tasks', JSON.stringify(tasks));
+}
+
+function filterTasks(filter, pill) {
+  currentFilter = filter;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  renderTaskList();
+}
+
+function renderTaskList() {
+  const list = document.getElementById('tasks-list');
+
+  const urgentCount = tasks.filter(t => t.urgency >= 4).length;
+  const soonCount   = tasks.filter(t => t.urgency === 3).length;
+  const lowCount    = tasks.filter(t => t.urgency <= 2).length;
+  document.getElementById('count-all').textContent    = tasks.length;
+  document.getElementById('count-urgent').textContent = urgentCount;
+  document.getElementById('count-soon').textContent   = soonCount;
+  document.getElementById('count-low').textContent    = lowCount;
+
+  let filtered = tasks;
+  if (currentFilter === 'urgent') filtered = tasks.filter(t => t.urgency >= 4);
+  if (currentFilter === 'soon')   filtered = tasks.filter(t => t.urgency === 3);
+  if (currentFilter === 'low')    filtered = tasks.filter(t => t.urgency <= 2);
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🏠</div>
+      <div class="empty-title">${tasks.length === 0 ? 'No tasks yet' : 'Nothing here'}</div>
+      <div class="empty-sub">${tasks.length === 0 ? 'Tap the button below to report\nyour first issue' : 'No tasks in this category'}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map((t, i) => `
+    <div class="task-card" style="animation-delay:${i * 0.04}s" onclick="openDetail('${t.id}')">
+      <div class="task-card-top">
+        <div class="task-name">${escHtml(t.title)}</div>
+        <div class="urgency-badge urgency-${t.urgency}">${escHtml(t.urgency_label)}</div>
+      </div>
+      <div class="task-meta">
+        <div class="task-meta-item">💰 $${t.cost_min}–$${t.cost_max}</div>
+        <div class="task-type-badge">${escHtml(t.type)}</div>
+        <div class="task-meta-item" style="margin-left:auto; font-size:10px;">${escHtml(t.date)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openDetail(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  activeTaskId = id;
+
+  document.getElementById('detail-title').textContent = task.title;
+
+  const badges = document.getElementById('detail-badges');
+  badges.innerHTML = `
+    <div class="urgency-badge urgency-${task.urgency}">${escHtml(task.urgency_label)}</div>
+    <div class="task-type-badge">${escHtml(task.type)}</div>
+    ${task.safety_flag ? '<div class="urgency-badge urgency-5">⚠ Safety Risk</div>' : ''}
+  `;
+
+  document.getElementById('detail-diagnosis').textContent = task.diagnosis;
+  document.getElementById('detail-cost').textContent = `$${task.cost_min}–$${task.cost_max}`;
+  document.getElementById('detail-cost-label').textContent = task.cost_note || '';
+
+  const stepsContainer = document.getElementById('detail-steps');
+  if (task.steps && task.steps.length) {
+    stepsContainer.innerHTML = task.steps.map((s, i) => `
+      <div class="detail-step">
+        <div class="detail-step-num">${i+1}</div>
+        <div class="detail-step-text">${escHtml(s)}</div>
+      </div>
+    `).join('');
+    document.getElementById('detail-steps-section').style.display = '';
+  } else {
+    document.getElementById('detail-steps-section').style.display = 'none';
+  }
+
+  showScreen('screen-detail');
+}
+
+function markDone() {
+  tasks = tasks.filter(t => t.id !== activeTaskId);
+  saveTasks();
+  showScreen('screen-tasks');
+  showToast('Task marked as done ✓');
+}
+
+function deleteTask() {
+  tasks = tasks.filter(t => t.id !== activeTaskId);
+  saveTasks();
+  showScreen('screen-tasks');
+  showToast('Task removed');
+}
+
+// ═══════════════════════════════════════
+// RFQ GENERATOR
+// ═══════════════════════════════════════
+function generateRFQ() {
+  const task = tasks.find(t => t.id === activeTaskId);
+  if (!task) return;
+
+  const rfq = `REQUEST FOR QUOTE — Home Repair
+Date: ${task.date}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ISSUE: ${task.title}
+PRIORITY: ${task.urgency_label}
+${task.safety_flag ? '⚠ SAFETY RISK — Please prioritize\n' : ''}
+DESCRIPTION:
+${task.diagnosis}
+
+BUDGET ESTIMATE: $${task.cost_min}–$${task.cost_max}
+
+OWNER NOTES:
+"${task.transcript}"
+
+Please provide a quote including:
+- Your diagnosis of the issue
+- Proposed fix and materials
+- Labour and parts cost breakdown
+- Estimated timeline
+- Availability for inspection
+
+Thank you.`;
+
+  document.getElementById('rfq-content').textContent = rfq;
+  document.getElementById('rfq-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('rfq-modal').classList.remove('open');
+}
+
+function copyRFQ() {
+  const text = document.getElementById('rfq-content').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Copied to clipboard ✓');
+    closeModal();
+  }).catch(() => {
+    showToast('Select and copy the text above');
+  });
+}
+
+// ═══════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+setupSpeech();
+
+// If they have tasks already, go straight to task list
+if (tasks.length > 0) {
+  showScreen('screen-tasks');
+}
+</script>
+
+</body>
+</html>
