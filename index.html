@@ -391,7 +391,7 @@ z-index: 0;
 // ═══════════════════════════════════════
 // CONFIG — update TOKEN to match your .env API_TOKEN
 // ═══════════════════════════════════════
-const API_TOKEN    = 'Lindsey123!';
+const API_TOKEN    = 'REPLACE_WITH_YOUR_API_TOKEN';
 const PROPERTY_ID  = 'david-home';
 const API_BASE     = '/api';
 
@@ -481,9 +481,11 @@ function setupSpeech() {
       if (e.results[i].isFinal) finalTranscript += t + ' ';
       else interim += t;
     }
-    const preview = document.getElementById('transcript-preview');
     const display = (finalTranscript + interim).trim();
-    if (display) { preview.textContent = display; preview.classList.add('has-text'); }
+    if (display) {
+      const textInput = document.getElementById('text-input');
+      textInput.value = display;
+    }
   };
 
   recognition.onerror = (e) => {
@@ -506,15 +508,18 @@ function startRecording(e) {
   const btn = document.getElementById('record-btn');
   const wrap = document.getElementById('record-btn-wrap');
   const waveform = document.getElementById('waveform');
-  const preview = document.getElementById('transcript-preview');
+  const textWrap = document.getElementById('text-input-wrap');
+  const textInput = document.getElementById('text-input');
 
   btn.classList.add('recording');
   wrap.classList.add('recording');
   waveform.classList.add('active');
-  preview.classList.add('visible');
-  preview.classList.remove('has-text');
-  preview.textContent = 'Listening…';
-  document.getElementById('record-instructions').innerHTML = 'Listening…<span class="sub">Release when done</span>';
+
+  // Always show text box immediately — speech fills it, user can edit
+  textWrap.classList.add('visible');
+  textInput.value = '';
+  textInput.placeholder = 'Listening… speak now, or type here';
+  document.getElementById('record-instructions').innerHTML = 'Listening…<span class="sub">Release when done — edit text if needed</span>';
 
   if (speechSupported && recognition) { try { recognition.start(); } catch(err) {} }
 
@@ -540,13 +545,19 @@ function stopRecording(e) {
 
   if (speechSupported && recognition) { try { recognition.stop(); } catch(err) {} }
 
-  const transcript = finalTranscript.trim();
+  const textInput = document.getElementById('text-input');
+  // If speech filled the box, use it; otherwise leave box open for typing
+  const boxText = textInput.value.trim();
+  const transcript = finalTranscript.trim() || boxText;
+
   if (transcript.length > 3) {
-    processTranscript(transcript);
+    // Put transcript in box so user can review/edit before submitting
+    textInput.value = transcript;
+    textInput.placeholder = 'Edit if needed, then tap Diagnose';
+    document.getElementById('record-instructions').innerHTML = "Review & submit<span class='sub'>Edit the text above if needed</span>";
   } else {
-    document.getElementById('text-input-wrap').classList.add('visible');
-    document.getElementById('record-instructions').innerHTML = "What's the problem?<span class='sub'>Type it below instead</span>";
-    document.getElementById('transcript-preview').classList.remove('visible');
+    textInput.placeholder = 'Describe the issue here…';
+    document.getElementById('record-instructions').innerHTML = "What's the problem?<span class='sub'>Type or hold button to speak again</span>";
   }
 }
 
@@ -574,7 +585,7 @@ function resetRecord() {
 
 function submitText() {
   const text = document.getElementById('text-input').value.trim();
-  if (text.length < 5) { showToast('Please describe the issue first'); return; }
+  if (text.length < 5) { showToast('Please describe the issue — speak or type it'); return; }
   processTranscript(text);
 }
 
