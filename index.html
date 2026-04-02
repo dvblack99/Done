@@ -177,6 +177,13 @@
 .toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px); background:var(–ok); color:#0e0e0e; font-family:‘DM Mono’,monospace; font-size:12px; font-weight:500; padding:10px 20px; border-radius:100px; opacity:0; transition:opacity 0.2s,transform 0.2s; pointer-events:none; z-index:200; white-space:nowrap; }
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 .toast.error { background:var(–danger); color:white; }
+
+/* VISION PROGRESS */
+.vision-progress { display:flex; flex-direction:column; align-items:center; gap:12px; }
+.vision-progress-label { font-family:‘Syne’,sans-serif; font-size:16px; font-weight:700; color:var(–text); text-align:center; }
+.vision-progress-bar-bg { width:100%; height:6px; background:var(–surface2); border-radius:3px; overflow:hidden; }
+.vision-progress-bar { height:100%; background:var(–accent); border-radius:3px; width:0%; transition:width 0.4s ease; }
+.vision-progress-sub { font-family:‘DM Mono’,monospace; font-size:11px; color:var(–muted); letter-spacing:0.06em; }
 </style>
 
 </head>
@@ -262,12 +269,19 @@
 
 <div class="screen" id="screen-processing">
   <div class="processing-orb"></div>
-  <div class="processing-label">Diagnosing issue…</div>
-  <div class="processing-steps">
+  <div class="processing-label" id="processing-label">Diagnosing issue...</div>
+  <div class="processing-steps" id="processing-steps-text">
     <div class="proc-step" id="proc-1"><div class="dot"></div>Analyzing description</div>
     <div class="proc-step" id="proc-2"><div class="dot"></div>Identifying root causes</div>
     <div class="proc-step" id="proc-3"><div class="dot"></div>Estimating cost &amp; urgency</div>
     <div class="proc-step" id="proc-4"><div class="dot"></div>Saving to your home log</div>
+  </div>
+  <div class="vision-progress" id="vision-progress" style="display:none;width:80%;max-width:300px">
+    <div class="vision-progress-label" id="vision-progress-label">Analyzing images...</div>
+    <div class="vision-progress-bar-bg">
+      <div class="vision-progress-bar" id="vision-progress-bar"></div>
+    </div>
+    <div class="vision-progress-sub" id="vision-progress-sub">0 frames processed</div>
   </div>
 </div>
 
@@ -450,8 +464,13 @@ function setupSpeech() {
       if (e.results[i].isFinal) finalTranscript += t + ' ';
       else interim += t;
     }
-    const display = (finalTranscript+interim).trim();
-    if (display) document.getElementById('text-input').value = display;
+    const speechText = (finalTranscript+interim).trim();
+    if (speechText) {
+      const ti = document.getElementById('text-input');
+      const existing = ti.value.trim();
+      // Append speech to any existing typed text
+      ti.value = existing ? existing + ' ' + speechText : speechText;
+    }
   };
   recognition.onerror = () => {};
 }
@@ -489,9 +508,9 @@ function stopRecording(e) {
   document.getElementById('record-timer').textContent = '';
   if (speechSupported && recognition) { try { recognition.stop(); } catch(err){} }
   const ti = document.getElementById('text-input');
-  const transcript = finalTranscript.trim() || ti.value.trim();
-  if (transcript.length > 3) {
-    ti.value = transcript;
+  // Don't overwrite - speech recognition already appended via onresult
+  // Just update placeholder to signal recording stopped
+  if (ti.value.trim().length > 3) {
     ti.placeholder = 'Edit if needed, then tap Diagnose';
   } else {
     ti.placeholder = 'Speak or type the issue...';
@@ -524,6 +543,7 @@ function submitText() {
   if (text.length < 5) { showToast('Please describe the issue'); return; }
   stopCamera();
   if (isUpdateMode) submitUpdate(text);
+  else if (capturedFrames.length > 0) processWithVision(text);
   else processTranscript(text);
 }
 
@@ -576,6 +596,9 @@ function captureFrame() {
 // API CALLS
 async function processTranscript(transcript) {
   showScreen('screen-processing');
+  document.getElementById('processing-steps-text').style.display='';
+  document.getElementById('vision-progress').style.display='none';
+  document.getElementById('processing-label').textContent='Diagnosing issue...';
   animateProcessingSteps();
   try {
     const task = await apiFetch('/done/diagnose', {
@@ -590,6 +613,66 @@ async function processTranscript(transcript) {
   } catch(err) {
     showScreen('screen-record');
     showToast('Could not diagnose -- '+( err.message||'please try again'), true);
+  }
+}
+
+async function processWithVision(transcript) {
+  showScreen('screen-processing');
+  // Show vision progress UI
+  document.getElementById('processing-steps-text').style.display='none';
+  document.getElementById('vision-progress').style.display='flex';
+  document.getElementById('processing-label').textContent='Analyzing recording...';
+  
+  const frames = capturedFrames.slice(); // copy before reset
+  const totalFrames = frames.length;
+  
+  // Animate progress bar while waiting
+  let progressPct = 0;
+  const progressEl = document.getElementById('vision-progress-bar');
+  const progressSub = document.getElementById('vision-progress-sub');
+  const progressLabel = document.getElementById('vision-progress-label');
+  
+  progressLabel.textContent = 'Analyzing ' + totalFrames + ' frame' + (totalFrames!==1?'s':'') + '...';
+  progressSub.textContent = 'Building visual context';
+  
+  // Fake progress animation - jumps to 90% then waits for response
+  const progressInterval = setInterval(() => {
+    if (progressPct < 85) {
+      progressPct += (85 - progressPct) * 0.08;
+      progressEl.style.width = progressPct + '%';
+      if (progressPct > 20) progressSub.textContent = 'Reading visual context...';
+      if (progressPct > 50) progressSub.textContent = 'Identifying issues...';
+      if (progressPct > 75) progressSub.textContent = 'Building diagnosis...';
+    }
+  }, 300);
+
+  try {
+    const task = await apiFetch('/done/diagnose-vision', {
+      method:'POST',
+      body:JSON.stringify({
+        transcript,
+        property_id: PROPERTY_ID,
+        frames: frames.map(f => ({
+          timestamp: f.timestamp,
+          dataUrl: f.dataUrl,
+          transcriptAtTime: f.transcriptAtTime
+        }))
+      })
+    });
+    
+    clearInterval(progressInterval);
+    progressEl.style.width = '100%';
+    progressSub.textContent = 'Done!';
+    
+    task.status = 'open';
+    tasks.unshift(task);
+    saveCache();
+    activeTaskId = task.id;
+    setTimeout(() => { showScreen('screen-tasks'); setTimeout(()=>openDetail(task.id),300); }, 800);
+  } catch(err) {
+    clearInterval(progressInterval);
+    showScreen('screen-record');
+    showToast('Vision diagnosis failed -- ' + (err.message||'please try again'), true);
   }
 }
 
@@ -703,7 +786,7 @@ function openDetail(id) {
      <div class="task-type-badge">${esc(task.type)}</div>
      ${task.safety_flag ? '<div class="urgency-badge urgency-5">&#x26A0; Safety Risk</div>' : ''}`;
   document.getElementById('detail-diagnosis').textContent = task.diagnosis;
-  document.getElementById('detail-cost').textContent = `$${task.cost_min}&#x2013;$${task.cost_max}`;
+  document.getElementById('detail-cost').textContent = '$' + task.cost_min + '-$' + task.cost_max;
   document.getElementById('detail-cost-label').textContent = task.cost_note||'';
   const stepsEl = document.getElementById('detail-steps');
   if (task.steps && task.steps.length) {
