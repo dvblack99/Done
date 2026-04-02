@@ -191,20 +191,33 @@ z-index: 0;
 .action-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 8px; font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: transform 0.15s; }
 .action-btn:active { transform: scale(0.97); }
 .action-btn.primary { background: var(–accent); color: #0e0e0e; }
-.action-btn.secondary { background: var(–surface); border: 1px solid var(–border); color: var(–text); }
-.action-btn.danger { background: rgba(224,92,92,0.08); border: 1px solid rgba(224,92,92,0.3); color: var(–danger); }
+.action-btn.secondary { background: #2e2e2e; border: 1px solid #555; color: #f0ede8; }
+.action-btn.update { background: #1a2a1a; border: 1px solid #4a7a4a; color: #6fc78a; }
+.action-btn.danger { background: #2a1a1a; border: 1px solid #7a3a3a; color: #e05c5c; }
+
+/* ══ UPDATE MODAL ══ */
+.update-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: none; align-items: flex-end; }
+.update-modal.open { display: flex; }
+.update-sheet { width: 100%; background: #1a1a1a; border-top: 1px solid #333; border-radius: 20px 20px 0 0; padding: 24px 24px 48px; animation: sheetUp 0.3s cubic-bezier(0.32,0.72,0,1); max-height: 80vh; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.update-sheet-header { display: flex; align-items: center; justify-content: space-between; }
+.update-sheet-title { font-family: ‘Syne’, sans-serif; font-size: 18px; font-weight: 800; color: #f0ede8; }
+.sheet-close-btn { background: #2e2e2e; border: 1px solid #555; color: #f0ede8; font-size: 16px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
 /* ══ RFQ MODAL ══ */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: none; align-items: flex-end; }
-.modal-overlay.open { display: flex; }
-.modal-sheet { width: 100%; background: var(–surface); border-top: 1px solid var(–border); border-radius: 20px 20px 0 0; padding: 28px 24px 48px; animation: sheetUp 0.3s cubic-bezier(0.32, 0.72, 0, 1); max-height: 85vh; overflow-y: auto; }
 @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.sheet-handle { width: 36px; height: 4px; background: var(–border); border-radius: 2px; margin: 0 auto 24px; }
-.sheet-title { font-family: ‘Syne’, sans-serif; font-size: 20px; font-weight: 800; color: var(–text); margin-bottom: 6px; }
-.sheet-sub { font-size: 13px; color: var(–muted); margin-bottom: 24px; line-height: 1.5; }
-.rfq-box { background: var(–bg); border: 1px solid var(–border); border-radius: 8px; padding: 16px; font-family: ‘DM Mono’, monospace; font-size: 12px; line-height: 1.8; color: var(–text); white-space: pre-wrap; margin-bottom: 16px; word-break: break-word; }
-.copy-btn { width: 100%; padding: 14px; background: var(–accent); color: #0e0e0e; border: none; border-radius: 8px; font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s; }
+@keyframes modalPop { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: none; align-items: center; justify-content: center; padding: 24px; }
+.modal-overlay.open { display: flex; }
+.modal-sheet { width: 100%; max-width: 480px; background: #1a1a1a; border: 1px solid #333; border-radius: 16px; padding: 24px; animation: modalPop 0.25s ease; max-height: 85vh; overflow-y: auto; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.sheet-handle { display: none; }
+.sheet-title { font-family: ‘Syne’, sans-serif; font-size: 20px; font-weight: 800; color: #f0ede8; }
+.sheet-sub { font-size: 13px; color: #888; margin-bottom: 20px; line-height: 1.5; margin-top: 4px; }
+.rfq-box { background: #0e0e0e; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; font-family: ‘DM Mono’, monospace; font-size: 12px; line-height: 1.8; color: #f0ede8; white-space: pre-wrap; margin-bottom: 16px; word-break: break-word; }
+.modal-actions { display: flex; gap: 10px; }
+.copy-btn { flex: 1; padding: 14px; background: var(–accent); color: #0e0e0e; border: none; border-radius: 8px; font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s; }
 .copy-btn:active { transform: scale(0.97); }
+.modal-close-btn { padding: 14px 18px; background: #2e2e2e; border: 1px solid #555; color: #f0ede8; border-radius: 8px; font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
 
 /* ══ TOAST ══ */
 .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(–ok); color: #0e0e0e; font-family: ‘DM Mono’, monospace; font-size: 12px; font-weight: 500; padding: 10px 20px; border-radius: 100px; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 200; white-space: nowrap; }
@@ -367,6 +380,7 @@ z-index: 0;
     </div>
     <div class="detail-actions">
       <button class="action-btn primary" onclick="generateRFQ()">📤 Generate Contractor RFQ</button>
+      <button class="action-btn update" onclick="openUpdateModal()">🎙 Add More Info</button>
       <button class="action-btn secondary" onclick="markDone()">✓ Mark as Done</button>
       <button class="action-btn danger" onclick="deleteTask()">Remove Task</button>
     </div>
@@ -377,11 +391,29 @@ z-index: 0;
 
 <div class="modal-overlay" id="rfq-modal" onclick="closeModal()">
   <div class="modal-sheet" onclick="event.stopPropagation()">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">Contractor Request for Quote</div>
-    <p class="sheet-sub">Copy this and send to local contractors.</p>
+    <div class="modal-header">
+      <div class="sheet-title">Contractor RFQ</div>
+      <button class="sheet-close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <p class="sheet-sub">Copy and send to local contractors.</p>
     <div class="rfq-box" id="rfq-content"></div>
-    <button class="copy-btn" onclick="copyRFQ()">Copy to Clipboard</button>
+    <div class="modal-actions">
+      <button class="copy-btn" onclick="copyRFQ()">Copy to Clipboard</button>
+      <button class="modal-close-btn" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ UPDATE TASK MODAL ══ -->
+
+<div class="update-modal" id="update-modal">
+  <div class="update-sheet">
+    <div class="update-sheet-header">
+      <div class="update-sheet-title">Add More Info</div>
+      <button class="sheet-close-btn" onclick="closeUpdateModal()">✕</button>
+    </div>
+    <textarea class="text-input" id="update-input" placeholder="Describe any new findings, changes, or additional details about this issue…" rows="4"></textarea>
+    <button class="action-btn primary" onclick="submitUpdate()" style="margin-top:4px">Update Diagnosis →</button>
   </div>
 </div>
 
@@ -790,9 +822,60 @@ function showToast(msg, isError = false) {
 }
 
 // ═══════════════════════════════════════
+// UPDATE TASK
+// ═══════════════════════════════════════
+function openUpdateModal() {
+  document.getElementById('update-input').value = '';
+  document.getElementById('update-modal').classList.add('open');
+}
+
+function closeUpdateModal() {
+  document.getElementById('update-modal').classList.remove('open');
+}
+
+async function submitUpdate() {
+  const extra = document.getElementById('update-input').value.trim();
+  if (extra.length < 5) { showToast('Please describe the update'); return; }
+  const task = tasks.find(t => t.id === activeTaskId);
+  if (!task) return;
+  closeUpdateModal();
+  showScreen('screen-processing');
+  animateProcessingSteps();
+  try {
+    const combined = task.transcript + '. Additional info: ' + extra;
+    const updated = await apiFetch('/done/diagnose', {
+      method: 'POST',
+      body: JSON.stringify({ transcript: combined, property_id: PROPERTY_ID })
+    });
+    // Replace old task with updated one, keeping same id
+    updated.id = task.id;
+    tasks = tasks.map(t => t.id === task.id ? updated : t);
+    localStorage.setItem('done_tasks_cache', JSON.stringify(tasks));
+    activeTaskId = updated.id;
+    setTimeout(() => {
+      showScreen('screen-tasks');
+      setTimeout(() => openDetail(updated.id), 300);
+    }, 600);
+    showToast('Task updated');
+  } catch(e) {
+    showScreen('screen-detail');
+    showToast('Update failed: ' + e.message, true);
+  }
+}
+
+// ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
+// Request mic permission once on load so it doesn't prompt mid-recording
+async function requestMicPermission() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach(t => t.stop());
+  } catch(e) { /* user denied - text fallback will handle it */ }
+}
+
 setupSpeech();
+requestMicPermission();
 
 (async () => {
   await loadTasksFromServer();
