@@ -468,7 +468,7 @@ function startRecording(e) {
   document.getElementById('cam-waveform').classList.add('active');
   document.getElementById('frame-counter').classList.add('active');
   document.getElementById('text-input').value = '';
-  document.getElementById('text-input').placeholder = 'Listening…';
+  document.getElementById('text-input').placeholder = 'Listening...';
   if (speechSupported && recognition) { try { recognition.start(); } catch(err){} }
   frameInterval = setInterval(captureFrame, 1000);
   recordSeconds = 0;
@@ -494,7 +494,7 @@ function stopRecording(e) {
     ti.value = transcript;
     ti.placeholder = 'Edit if needed, then tap Diagnose';
   } else {
-    ti.placeholder = 'Speak or type the issue…';
+    ti.placeholder = 'Speak or type the issue...';
   }
 }
 
@@ -516,7 +516,7 @@ function resetRecord() {
   document.getElementById('frame-counter').classList.remove('active');
   document.getElementById('record-timer').textContent = '';
   document.getElementById('text-input').value = '';
-  document.getElementById('text-input').placeholder = 'Hold the button and speak — or type here…';
+  document.getElementById('text-input').placeholder = 'Hold the button and speak -- or type here...';
 }
 
 function submitText() {
@@ -589,7 +589,7 @@ async function processTranscript(transcript) {
     setTimeout(() => { showScreen('screen-tasks'); setTimeout(()=>openDetail(task.id),300); }, 600);
   } catch(err) {
     showScreen('screen-record');
-    showToast('Could not diagnose — '+( err.message||'please try again'), true);
+    showToast('Could not diagnose -- '+( err.message||'please try again'), true);
   }
 }
 
@@ -760,18 +760,17 @@ async function emptyTrash() {
 function generateRFQ() {
   const task = tasks.find(t=>t.id===activeTaskId);
   if (!task) return;
-  const rfq = `REQUEST FOR QUOTE — Home Repair
+  const rfq = `REQUEST FOR QUOTE -- Home Repair
 Date: ${task.date}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+==============================
 
 ISSUE: ${task.title}
 PRIORITY: ${task.urgency_label}
-${task.safety_flag?'⚠ SAFETY RISK — Please prioritize
-':''}
+${task.safety_flag?'(!) SAFETY RISK -- Please prioritize | ':''}
 DESCRIPTION:
 ${task.diagnosis}
 
-BUDGET ESTIMATE: $${task.cost_min}–$${task.cost_max}
+BUDGET ESTIMATE: $${task.cost_min}-$${task.cost_max}
 
 OWNER NOTES:
 "${task.transcript}"
