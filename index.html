@@ -540,11 +540,28 @@ function resetRecord() {
 
 function submitText() {
   const text = document.getElementById('text-input').value.trim();
-  if (text.length < 5) { showToast('Please describe the issue'); return; }
+  const hasText = text.length > 0;
+  const hasFrames = capturedFrames.length > 0;
+
+  if (!hasText && !hasFrames) {
+    showToast('Please speak or type a description, or capture some video');
+    return;
+  }
+
   stopCamera();
-  if (isUpdateMode) submitUpdate(text);
-  else if (capturedFrames.length > 0) processWithVision(text);
-  else processTranscript(text);
+
+  if (isUpdateMode) {
+    submitUpdate(text || 'No additional text provided');
+    return;
+  }
+
+  if (hasFrames) {
+    // Vision diagnosis - works with text, frames, or both
+    processWithVision(text || 'No verbal description provided');
+  } else {
+    // Text-only diagnosis
+    processTranscript(text);
+  }
 }
 
 // CAMERA
