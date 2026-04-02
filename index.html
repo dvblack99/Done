@@ -7,312 +7,258 @@
 <title>Done — Home Maintenance, Simplified</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
-
-:root {
-–bg: #0e0e0e;
-–surface: #171717;
-–surface2: #202020;
-–border: #2a2a2a;
-–text: #f0ede8;
-–muted: #666;
-–accent: #e8d5a3;
-–accent2: #c4a96b;
-–danger: #e05c5c;
-–ok: #6fc78a;
-–warn: #e8a84a;
-–record: #e05c5c;
-–record-glow: rgba(224, 92, 92, 0.35);
-}
-
-- { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html { scroll-behavior: smooth; }
-  body {
-  font-family: ‘DM Sans’, sans-serif;
-  background: var(–bg);
-  color: var(–text);
-  min-height: 100vh;
-  overflow-x: hidden;
+  :root {
+    --bg:#0e0e0e; --surface:#171717; --surface2:#202020; --border:#2a2a2a;
+    --text:#f0ede8; --muted:#666; --accent:#e8d5a3; --accent2:#c4a96b;
+    --danger:#e05c5c; --ok:#6fc78a; --warn:#e8a84a;
+    --record:#e05c5c; --record-glow:rgba(224,92,92,0.35);
   }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html { scroll-behavior:smooth; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E"); opacity:0.025; pointer-events:none; z-index:0; }
+  .screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
+  .screen.active { display:flex; }
 
-body::before {
-content: ‘’;
-position: fixed;
-inset: 0;
-background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘1’/%3E%3C/svg%3E”);
-opacity: 0.025;
-pointer-events: none;
-z-index: 0;
-}
+/* LANDING */
+.landing-hero { padding:64px 28px 48px; display:flex; flex-direction:column; }
+.landing-eyebrow { font-family:‘DM Mono’,monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:var(–accent2); margin-bottom:20px; }
+.landing-title { font-family:‘Syne’,sans-serif; font-size:clamp(52px,14vw,80px); font-weight:800; line-height:0.92; letter-spacing:-0.03em; color:var(–text); margin-bottom:24px; }
+.landing-title span { color:var(–accent); display:block; }
+.landing-tagline { font-family:‘DM Mono’,monospace; font-size:13px; font-weight:300; color:var(–muted); line-height:1.7; max-width:340px; margin-bottom:40px; }
+.landing-tagline strong { color:var(–text); font-weight:500; }
+.btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:10px; background:var(–accent); color:#0e0e0e; font-family:‘Syne’,sans-serif; font-size:15px; font-weight:700; padding:18px 32px; border:none; border-radius:4px; cursor:pointer; width:100%; max-width:320px; transition:transform 0.15s; }
+.btn-primary:active { transform:scale(0.97); }
+.btn-primary .arrow { font-size:18px; }
+.landing-divider { height:1px; background:var(–border); margin:0 28px; }
+.landing-section { padding:48px 28px; }
+.section-label { font-family:‘DM Mono’,monospace; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(–muted); margin-bottom:28px; }
+.steps-list { display:flex; flex-direction:column; gap:24px; }
+.step { display:flex; gap:20px; align-items:flex-start; }
+.step-num { font-family:‘Syne’,sans-serif; font-size:11px; font-weight:700; color:var(–accent2); background:var(–surface); border:1px solid var(–border); width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:50%; flex-shrink:0; }
+.step-text { font-size:14px; line-height:1.6; color:var(–text); }
+.step-text em { font-style:normal; color:var(–muted); font-size:12px; display:block; margin-top:4px; }
+.features-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.feature-card { background:var(–surface); border:1px solid var(–border); border-radius:8px; padding:18px 16px; }
+.feature-card:first-child { grid-column:1/-1; background:linear-gradient(135deg,var(–surface2) 0%,#1a1a14 100%); border-color:var(–accent2); }
+.feature-icon { font-size:22px; margin-bottom:10px; display:block; }
+.feature-title { font-family:‘Syne’,sans-serif; font-size:14px; font-weight:700; color:var(–text); margin-bottom:6px; }
+.feature-desc { font-size:12px; line-height:1.55; color:var(–muted); }
+.landing-cta-bottom { padding:40px 28px 60px; display:flex; flex-direction:column; gap:16px; align-items:center; }
+.privacy-note { font-family:‘DM Mono’,monospace; font-size:10px; color:var(–muted); text-align:center; line-height:1.6; }
 
-.screen { display: none; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
-.screen.active { display: flex; }
+/* RECORD - CAMERA LAYOUT */
+#screen-record { position:fixed; inset:0; background:#000; overflow:hidden; display:none; flex-direction:column; z-index:50; }
+#screen-record.active { display:flex; }
+.record-top-bar { position:absolute; top:0; left:0; right:0; z-index:10; padding:48px 16px 12px; background:linear-gradient(to bottom,rgba(0,0,0,0.75) 0%,transparent 100%); display:flex; align-items:center; justify-content:space-between; }
+.record-top-label { font-family:‘DM Mono’,monospace; font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:rgba(255,255,255,0.6); }
+.camera-viewport { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#111; }
+.camera-off-placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; background:#0a0a0a; z-index:1; }
+.camera-off-icon { font-size:48px; opacity:0.3; }
+.camera-off-text { font-family:‘DM Mono’,monospace; font-size:12px; color:rgba(255,255,255,0.3); letter-spacing:0.1em; }
+.cam-waveform { position:absolute; bottom:190px; left:0; right:0; height:40px; display:flex; align-items:center; justify-content:center; gap:3px; z-index:10; opacity:0; transition:opacity 0.3s; pointer-events:none; }
+.cam-waveform.active { opacity:1; }
+.cam-wave-bar { width:3px; height:4px; background:rgba(255,255,255,0.8); border-radius:2px; }
+.cam-waveform.active .cam-wave-bar { animation:wavePulse 0.6s ease-in-out infinite alternate; }
+@keyframes wavePulse { 0%{height:4px;opacity:0.3} 100%{height:var(–peak,28px);opacity:1} }
+.frame-counter { position:absolute; top:100px; right:16px; font-family:‘DM Mono’,monospace; font-size:10px; color:rgba(255,255,255,0.6); background:rgba(0,0,0,0.5); padding:4px 8px; border-radius:4px; z-index:10; display:none; }
+.frame-counter.active { display:block; }
+.record-text-overlay { position:absolute; bottom:106px; left:0; right:0; z-index:10; padding:0 16px; }
+.record-text-overlay textarea { width:100%; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.25); border-radius:12px; padding:12px 14px; font-family:‘DM Sans’,sans-serif; font-size:14px; color:#fff; resize:none; outline:none; line-height:1.5; min-height:52px; max-height:110px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+.record-text-overlay textarea::placeholder { color:rgba(255,255,255,0.35); }
+.record-bottom-bar { position:absolute; bottom:0; left:0; right:0; z-index:10; padding:14px 20px 44px; background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 100%); display:flex; align-items:center; gap:14px; }
+.rec-btn { width:68px; height:68px; border-radius:50%; border:3px solid rgba(255,255,255,0.25); background:var(–record); cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform 0.15s,box-shadow 0.2s; -webkit-user-select:none; user-select:none; position:relative; }
+.rec-btn.recording { border-color:#fff; box-shadow:0 0 0 6px rgba(224,92,92,0.4),0 0 28px rgba(224,92,92,0.5); }
+.rec-btn-inner { width:26px; height:26px; background:#fff; border-radius:50%; transition:border-radius 0.2s,width 0.2s,height 0.2s; }
+.rec-btn.recording .rec-btn-inner { border-radius:5px; width:20px; height:20px; }
+.rec-timer { position:absolute; bottom:-18px; left:50%; transform:translateX(-50%); font-family:‘DM Mono’,monospace; font-size:10px; color:rgba(255,255,255,0.6); white-space:nowrap; }
+.rec-submit-btn { flex:1; height:54px; background:var(–accent); color:#0e0e0e; border:none; border-radius:12px; font-family:‘Syne’,sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:transform 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.rec-submit-btn:active { transform:scale(0.97); }
+.back-btn { background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.85); font-family:‘DM Mono’,monospace; font-size:11px; letter-spacing:0.1em; padding:8px 14px; border-radius:4px; cursor:pointer; }
 
-/* ══ LANDING ══ */
-.landing-hero { padding: 64px 28px 48px; display: flex; flex-direction: column; gap: 0; }
-.landing-eyebrow { font-family: ‘DM Mono’, monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(–accent2); margin-bottom: 20px; }
-.landing-title { font-family: ‘Syne’, sans-serif; font-size: clamp(52px, 14vw, 80px); font-weight: 800; line-height: 0.92; letter-spacing: -0.03em; color: var(–text); margin-bottom: 24px; }
-.landing-title span { color: var(–accent); display: block; }
-.landing-tagline { font-family: ‘DM Mono’, monospace; font-size: 13px; font-weight: 300; color: var(–muted); line-height: 1.7; max-width: 340px; margin-bottom: 40px; }
-.landing-tagline strong { color: var(–text); font-weight: 500; }
-.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: var(–accent); color: #0e0e0e; font-family: ‘Syne’, sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.02em; padding: 18px 32px; border: none; border-radius: 4px; cursor: pointer; width: 100%; max-width: 320px; transition: transform 0.15s, background 0.15s; }
-.btn-primary:active { transform: scale(0.97); }
-.btn-primary .arrow { font-size: 18px; transition: transform 0.2s; }
-.btn-primary:hover .arrow { transform: translateX(4px); }
-.landing-divider { height: 1px; background: var(–border); margin: 0 28px; }
-.landing-section { padding: 48px 28px; }
-.section-label { font-family: ‘DM Mono’, monospace; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(–muted); margin-bottom: 28px; }
-.steps-list { display: flex; flex-direction: column; gap: 24px; }
-.step { display: flex; gap: 20px; align-items: flex-start; }
-.step-num { font-family: ‘Syne’, sans-serif; font-size: 11px; font-weight: 700; color: var(–accent2); background: var(–surface); border: 1px solid var(–border); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; margin-top: 1px; }
-.step-text { font-size: 14px; line-height: 1.6; color: var(–text); }
-.step-text em { font-style: normal; color: var(–muted); font-size: 12px; display: block; margin-top: 4px; }
-.features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.feature-card { background: var(–surface); border: 1px solid var(–border); border-radius: 8px; padding: 18px 16px; }
-.feature-card:first-child { grid-column: 1 / -1; background: linear-gradient(135deg, var(–surface2) 0%, #1a1a14 100%); border-color: var(–accent2); }
-.feature-icon { font-size: 22px; margin-bottom: 10px; display: block; }
-.feature-title { font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; color: var(–text); margin-bottom: 6px; }
-.feature-desc { font-size: 12px; line-height: 1.55; color: var(–muted); }
-.landing-cta-bottom { padding: 40px 28px 60px; display: flex; flex-direction: column; gap: 16px; align-items: center; }
-.privacy-note { font-family: ‘DM Mono’, monospace; font-size: 10px; color: var(–muted); text-align: center; letter-spacing: 0.05em; line-height: 1.6; }
+/* PROCESSING */
+#screen-processing { align-items:center; justify-content:center; gap:32px; background:radial-gradient(ellipse at 50% 50%,#111400 0%,var(–bg) 70%); }
+.processing-orb { width:80px; height:80px; border-radius:50%; background:conic-gradient(from 0deg,var(–accent2),var(–accent),transparent,var(–accent2)); animation:orbSpin 1.4s linear infinite; position:relative; }
+.processing-orb::after { content:’’; position:absolute; inset:6px; background:#111400; border-radius:50%; }
+@keyframes orbSpin { to{transform:rotate(360deg)} }
+.processing-label { font-family:‘Syne’,sans-serif; font-size:20px; font-weight:700; color:var(–text); text-align:center; }
+.processing-steps { display:flex; flex-direction:column; gap:10px; align-items:center; }
+.proc-step { font-family:‘DM Mono’,monospace; font-size:12px; color:var(–muted); letter-spacing:0.06em; display:flex; align-items:center; gap:10px; opacity:0; transition:opacity 0.4s; }
+.proc-step.visible { opacity:1; } .proc-step.done { color:var(–ok); }
+.proc-step .dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
 
-/* ══ RECORD ══ */
-#screen-record { align-items: center; justify-content: space-between; padding: 40px 28px 56px; background: radial-gradient(ellipse at 50% 60%, #1c1200 0%, var(–bg) 70%); }
-.record-header { width: 100%; display: flex; align-items: center; justify-content: space-between; }
-.back-btn { background: none; border: 1px solid var(–border); color: var(–muted); font-family: ‘DM Mono’, monospace; font-size: 11px; letter-spacing: 0.1em; padding: 8px 14px; border-radius: 4px; cursor: pointer; transition: color 0.15s, border-color 0.15s; }
-.back-btn:hover { color: var(–text); border-color: var(–muted); }
-.record-screen-label { font-family: ‘DM Mono’, monospace; font-size: 10px; letter-spacing: 0.2em; color: var(–muted); text-transform: uppercase; }
-.record-center { display: flex; flex-direction: column; align-items: center; gap: 36px; flex: 1; justify-content: center; }
-.record-instructions { font-family: ‘Syne’, sans-serif; font-size: 22px; font-weight: 700; color: var(–text); text-align: center; line-height: 1.3; max-width: 260px; }
-.record-instructions .sub { display: block; font-family: ‘DM Sans’, sans-serif; font-size: 13px; font-weight: 400; color: var(–muted); margin-top: 8px; }
-.waveform-container { width: 100%; height: 56px; display: flex; align-items: center; justify-content: center; gap: 3px; opacity: 0; transition: opacity 0.3s; }
-.waveform-container.active { opacity: 1; }
-.wave-bar { width: 3px; height: 6px; background: var(–accent); border-radius: 2px; }
-.waveform-container.active .wave-bar { animation: wavePulse 0.6s ease-in-out infinite alternate; }
-.wave-bar:nth-child(1)  { animation-delay: 0.00s; } .wave-bar:nth-child(2)  { animation-delay: 0.05s; }
-.wave-bar:nth-child(3)  { animation-delay: 0.10s; } .wave-bar:nth-child(4)  { animation-delay: 0.15s; }
-.wave-bar:nth-child(5)  { animation-delay: 0.20s; } .wave-bar:nth-child(6)  { animation-delay: 0.25s; }
-.wave-bar:nth-child(7)  { animation-delay: 0.30s; } .wave-bar:nth-child(8)  { animation-delay: 0.35s; }
-.wave-bar:nth-child(9)  { animation-delay: 0.40s; } .wave-bar:nth-child(10) { animation-delay: 0.45s; }
-.wave-bar:nth-child(11) { animation-delay: 0.50s; } .wave-bar:nth-child(12) { animation-delay: 0.45s; }
-.wave-bar:nth-child(13) { animation-delay: 0.40s; } .wave-bar:nth-child(14) { animation-delay: 0.35s; }
-.wave-bar:nth-child(15) { animation-delay: 0.30s; } .wave-bar:nth-child(16) { animation-delay: 0.25s; }
-.wave-bar:nth-child(17) { animation-delay: 0.20s; } .wave-bar:nth-child(18) { animation-delay: 0.15s; }
-.wave-bar:nth-child(19) { animation-delay: 0.10s; } .wave-bar:nth-child(20) { animation-delay: 0.05s; }
-@keyframes wavePulse { 0% { height: 4px; opacity: 0.3; } 100% { height: var(–peak, 32px); opacity: 1; } }
-.record-btn-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
-.record-ring { position: absolute; width: 140px; height: 140px; border-radius: 50%; border: 1px solid var(–record-glow); animation: ringPulse 2.5s ease-in-out infinite; opacity: 0; transition: opacity 0.3s; }
-.record-ring:nth-child(2) { animation-delay: 0.8s; } .record-ring:nth-child(3) { animation-delay: 1.6s; }
-.record-btn-wrap.recording .record-ring { opacity: 1; }
-@keyframes ringPulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(2); opacity: 0; } }
-.record-btn { width: 100px; height: 100px; border-radius: 50%; border: none; background: var(–record); cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; transition: transform 0.15s, box-shadow 0.3s; -webkit-user-select: none; user-select: none; }
-.record-btn:active, .record-btn.recording { transform: scale(0.93); box-shadow: 0 0 40px 16px var(–record-glow); }
-.record-btn-inner { width: 36px; height: 36px; background: white; border-radius: 50%; transition: border-radius 0.2s, width 0.2s, height 0.2s; }
-.record-btn.recording .record-btn-inner { border-radius: 6px; width: 28px; height: 28px; }
-.record-timer { font-family: ‘DM Mono’, monospace; font-size: 14px; color: var(–muted); letter-spacing: 0.1em; min-height: 20px; }
-.transcript-preview { width: 100%; min-height: 52px; background: var(–surface); border: 1px solid var(–border); border-radius: 8px; padding: 14px 16px; font-family: ‘DM Mono’, monospace; font-size: 12px; color: var(–muted); line-height: 1.6; font-style: italic; display: none; }
-.transcript-preview.visible { display: block; }
-.transcript-preview.has-text { color: var(–text); font-style: normal; }
-.record-hint { font-family: ‘DM Mono’, monospace; font-size: 11px; color: var(–muted); text-align: center; letter-spacing: 0.05em; line-height: 1.6; }
-.text-input-wrap { width: 100%; display: none; }
-.text-input-wrap.visible { display: block; }
-.text-input { width: 100%; background: var(–surface); border: 1px solid var(–border); border-radius: 8px; padding: 14px 16px; font-family: ‘DM Sans’, sans-serif; font-size: 14px; color: var(–text); resize: none; min-height: 80px; outline: none; line-height: 1.6; }
-.text-input:focus { border-color: var(–accent2); }
-.text-input::placeholder { color: var(–muted); }
-.submit-text-btn { margin-top: 10px; width: 100%; padding: 14px; background: var(–record); color: white; border: none; border-radius: 8px; font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s; }
-.submit-text-btn:active { transform: scale(0.97); }
+/* TASKS */
+#screen-tasks { padding:0; }
+.tasks-header { padding:44px 24px 12px; border-bottom:1px solid var(–border); position:sticky; top:0; background:var(–bg); z-index:10; }
+.tasks-header-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
+.tasks-title { font-family:‘Syne’,sans-serif; font-size:28px; font-weight:800; color:var(–text); line-height:1; }
+.tasks-title span { display:block; font-family:‘DM Mono’,monospace; font-size:11px; font-weight:400; color:var(–muted); letter-spacing:0.1em; margin-bottom:6px; }
+.add-task-btn { background:var(–accent); border:none; color:#0e0e0e; font-family:‘Syne’,sans-serif; font-size:22px; font-weight:700; width:44px; height:44px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:transform 0.15s; }
+.add-task-btn:active { transform:scale(0.9); }
+.summary-pills { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; margin-bottom:10px; }
+.summary-pills::-webkit-scrollbar { display:none; }
+.pill { display:flex; align-items:center; gap:6px; background:var(–surface); border:1px solid var(–border); border-radius:100px; padding:6px 12px; white-space:nowrap; cursor:pointer; transition:border-color 0.15s; }
+.pill.active { border-color:var(–accent2); }
+.pill-dot { width:7px; height:7px; border-radius:50%; }
+.pill-label { font-family:‘DM Mono’,monospace; font-size:10px; letter-spacing:0.08em; color:var(–muted); }
+.pill.active .pill-label { color:var(–text); }
+.pill-count { font-family:‘DM Mono’,monospace; font-size:10px; color:var(–accent2); }
+.tasks-secondary-row { display:flex; gap:8px; padding-bottom:4px; }
+.view-btn { font-family:‘DM Mono’,monospace; font-size:11px; letter-spacing:0.06em; padding:6px 14px; border-radius:6px; border:1px solid var(–border); background:none; color:var(–muted); cursor:pointer; text-transform:uppercase; transition:all 0.15s; }
+.view-btn.completed-btn.active-view { border-color:var(–ok); color:var(–ok); background:rgba(111,199,138,0.06); }
+.view-btn.trash-btn.active-view { border-color:var(–danger); color:var(–danger); background:rgba(224,92,92,0.06); }
+.view-btn.back-btn-view { border-color:#555; color:var(–text); background:var(–surface2); }
+.tasks-list { padding:16px 16px 100px; display:flex; flex-direction:column; gap:10px; }
+.task-card { background:var(–surface); border:1px solid var(–border); border-radius:10px; padding:16px; cursor:pointer; transition:border-color 0.2s,transform 0.15s; animation:cardIn 0.35s ease both; }
+@keyframes cardIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.task-card:active { transform:scale(0.98); }
+.task-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.task-name { font-family:‘Syne’,sans-serif; font-size:15px; font-weight:700; color:var(–text); line-height:1.3; flex:1; }
+.urgency-badge { font-family:‘DM Mono’,monospace; font-size:10px; letter-spacing:0.08em; font-weight:500; padding:4px 9px; border-radius:100px; white-space:nowrap; flex-shrink:0; }
+.urgency-1,.urgency-2 { background:rgba(111,199,138,0.12); color:var(–ok); }
+.urgency-3 { background:rgba(232,168,74,0.12); color:var(–warn); }
+.urgency-4,.urgency-5 { background:rgba(224,92,92,0.12); color:var(–danger); }
+.task-meta { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.task-meta-item { font-family:‘DM Mono’,monospace; font-size:11px; color:var(–muted); }
+.task-type-badge { font-family:‘DM Mono’,monospace; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid var(–border); color:var(–muted); }
+.empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 40px; gap:16px; text-align:center; }
+.empty-icon { font-size:48px; opacity:0.4; }
+.empty-title { font-family:‘Syne’,sans-serif; font-size:18px; font-weight:700; color:var(–muted); }
+.empty-sub { font-size:13px; color:var(–muted); opacity:0.6; line-height:1.6; }
+.fab { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:var(–accent); color:#0e0e0e; border:none; font-family:‘Syne’,sans-serif; font-size:14px; font-weight:700; padding:16px 32px; border-radius:100px; cursor:pointer; box-shadow:0 8px 32px rgba(0,0,0,0.5); display:flex; align-items:center; gap:10px; z-index:20; white-space:nowrap; transition:transform 0.15s; }
+.fab:active { transform:translateX(-50%) scale(0.95); }
+.card-restore-btn { font-family:‘DM Mono’,monospace; font-size:10px; padding:5px 10px; border-radius:4px; border:1px solid var(–ok); background:rgba(111,199,138,0.08); color:var(–ok); cursor:pointer; white-space:nowrap; }
+.trash-actions { padding:0 0 8px; display:flex; justify-content:flex-end; }
+.purge-btn { font-family:‘DM Mono’,monospace; font-size:11px; padding:8px 16px; border-radius:6px; border:1px solid rgba(224,92,92,0.4); background:rgba(224,92,92,0.08); color:var(–danger); cursor:pointer; }
 
-/* ══ PROCESSING ══ */
-#screen-processing { align-items: center; justify-content: center; gap: 32px; background: radial-gradient(ellipse at 50% 50%, #111400 0%, var(–bg) 70%); }
-.processing-orb { width: 80px; height: 80px; border-radius: 50%; background: conic-gradient(from 0deg, var(–accent2), var(–accent), transparent, var(–accent2)); animation: orbSpin 1.4s linear infinite; position: relative; }
-.processing-orb::after { content: ‘’; position: absolute; inset: 6px; background: #111400; border-radius: 50%; }
-@keyframes orbSpin { to { transform: rotate(360deg); } }
-.processing-label { font-family: ‘Syne’, sans-serif; font-size: 20px; font-weight: 700; color: var(–text); text-align: center; }
-.processing-steps { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-.proc-step { font-family: ‘DM Mono’, monospace; font-size: 12px; color: var(–muted); letter-spacing: 0.06em; display: flex; align-items: center; gap: 10px; opacity: 0; transition: opacity 0.4s; }
-.proc-step.visible { opacity: 1; } .proc-step.done { color: var(–ok); }
-.proc-step .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+/* DETAIL */
+#screen-detail { padding:0; overflow-y:auto; }
+.detail-header { padding:44px 24px 24px; border-bottom:1px solid var(–border); display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.detail-back { background:none; border:none; color:var(–accent2); font-family:‘DM Mono’,monospace; font-size:12px; cursor:pointer; padding:0; letter-spacing:0.05em; display:flex; align-items:center; gap:6px; flex-shrink:0; margin-top:2px; }
+.detail-title-block { flex:1; }
+.detail-title { font-family:‘Syne’,sans-serif; font-size:22px; font-weight:800; color:var(–text); line-height:1.2; margin-bottom:12px; }
+.detail-badges { display:flex; gap:8px; flex-wrap:wrap; }
+.detail-body { padding:24px; display:flex; flex-direction:column; gap:24px; padding-bottom:40px; }
+.detail-section { background:var(–surface); border:1px solid var(–border); border-radius:10px; padding:18px; }
+.detail-section-label { font-family:‘DM Mono’,monospace; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:var(–accent2); margin-bottom:12px; }
+.detail-section-content { font-size:14px; line-height:1.7; color:var(–text); }
+.detail-steps { display:flex; flex-direction:column; gap:12px; }
+.detail-step { display:flex; gap:14px; align-items:flex-start; }
+.detail-step-num { font-family:‘DM Mono’,monospace; font-size:11px; color:var(–accent2); background:var(–surface2); border:1px solid var(–border); width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:50%; flex-shrink:0; }
+.detail-step-text { font-size:13px; line-height:1.6; color:var(–text); }
+.cost-display { display:flex; align-items:baseline; gap:8px; }
+.cost-amount { font-family:‘Syne’,sans-serif; font-size:28px; font-weight:800; color:var(–accent); }
+.cost-label { font-family:‘DM Mono’,monospace; font-size:11px; color:var(–muted); }
+.detail-actions { display:flex; flex-direction:column; gap:10px; }
+.action-btn { display:flex; align-items:center; justify-content:center; gap:10px; padding:16px; border-radius:8px; font-family:‘Syne’,sans-serif; font-size:14px; font-weight:700; cursor:pointer; border:none; transition:transform 0.15s; }
+.action-btn:active { transform:scale(0.97); }
+.action-btn.primary { background:var(–accent); color:#0e0e0e; }
+.action-btn.secondary { background:#2e2e2e; border:1px solid #555; color:#f0ede8; }
+.action-btn.update { background:#1a2a1a; border:1px solid #4a7a4a; color:var(–ok); }
+.action-btn.danger { background:#2a1a1a; border:1px solid #7a3a3a; color:var(–danger); }
 
-/* ══ TASKS ══ */
-#screen-tasks { padding: 0; }
-.tasks-header { padding: 44px 24px 20px; border-bottom: 1px solid var(–border); position: sticky; top: 0; background: var(–bg); z-index: 10; }
-.tasks-header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
-.tasks-title { font-family: ‘Syne’, sans-serif; font-size: 28px; font-weight: 800; color: var(–text); line-height: 1; }
-.tasks-title span { display: block; font-family: ‘DM Mono’, monospace; font-size: 11px; font-weight: 400; color: var(–muted); letter-spacing: 0.1em; margin-bottom: 6px; }
-.add-task-btn { background: var(–accent); border: none; color: #0e0e0e; font-family: ‘Syne’, sans-serif; font-size: 22px; font-weight: 700; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 4px; transition: transform 0.15s; }
-.add-task-btn:active { transform: scale(0.9); }
-.summary-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-.summary-pills::-webkit-scrollbar { display: none; }
-.pill { display: flex; align-items: center; gap: 6px; background: var(–surface); border: 1px solid var(–border); border-radius: 100px; padding: 6px 12px; white-space: nowrap; cursor: pointer; transition: border-color 0.15s; }
-.pill.active { border-color: var(–accent2); }
-.pill-dot { width: 7px; height: 7px; border-radius: 50%; }
-.pill-label { font-family: ‘DM Mono’, monospace; font-size: 10px; letter-spacing: 0.08em; color: var(–muted); }
-.pill.active .pill-label { color: var(–text); }
-.pill-count { font-family: ‘DM Mono’, monospace; font-size: 10px; color: var(–accent2); }
-.tasks-list { padding: 16px 16px 100px; display: flex; flex-direction: column; gap: 10px; }
-.task-card { background: var(–surface); border: 1px solid var(–border); border-radius: 10px; padding: 16px; cursor: pointer; transition: border-color 0.2s, transform 0.15s; animation: cardIn 0.35s ease both; }
-@keyframes cardIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-.task-card:active { transform: scale(0.98); }
-.task-card:hover { border-color: #3a3a3a; }
-.task-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-.task-name { font-family: ‘Syne’, sans-serif; font-size: 15px; font-weight: 700; color: var(–text); line-height: 1.3; flex: 1; }
-.urgency-badge { font-family: ‘DM Mono’, monospace; font-size: 10px; letter-spacing: 0.08em; font-weight: 500; padding: 4px 9px; border-radius: 100px; white-space: nowrap; flex-shrink: 0; }
-.urgency-1, .urgency-2 { background: rgba(111,199,138,0.12); color: var(–ok); }
-.urgency-3             { background: rgba(232,168,74,0.12);  color: var(–warn); }
-.urgency-4, .urgency-5 { background: rgba(224,92,92,0.12);   color: var(–danger); }
-.task-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.task-meta-item { font-family: ‘DM Mono’, monospace; font-size: 11px; color: var(–muted); display: flex; align-items: center; gap: 5px; }
-.task-type-badge { font-family: ‘DM Mono’, monospace; font-size: 10px; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 4px; border: 1px solid var(–border); color: var(–muted); }
-.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 40px; gap: 16px; text-align: center; }
-.empty-icon { font-size: 48px; opacity: 0.4; }
-.empty-title { font-family: ‘Syne’, sans-serif; font-size: 18px; font-weight: 700; color: var(–muted); }
-.empty-sub { font-size: 13px; color: var(–muted); opacity: 0.6; line-height: 1.6; }
-.fab { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: var(–accent); color: #0e0e0e; border: none; font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; padding: 16px 32px; border-radius: 100px; cursor: pointer; box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(232,213,163,0.15); display: flex; align-items: center; gap: 10px; z-index: 20; white-space: nowrap; transition: transform 0.15s; }
-.fab:active { transform: translateX(-50%) scale(0.95); }
+/* RFQ MODAL */
+@keyframes modalPop { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+@keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; display:none; align-items:center; justify-content:center; padding:24px; }
+.modal-overlay.open { display:flex; }
+.modal-sheet { width:100%; max-width:480px; background:#1a1a1a; border:1px solid #333; border-radius:16px; padding:24px; animation:modalPop 0.25s ease; max-height:85vh; overflow-y:auto; }
+.modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.sheet-title { font-family:‘Syne’,sans-serif; font-size:20px; font-weight:800; color:#f0ede8; }
+.sheet-close-btn { background:#2e2e2e; border:1px solid #555; color:#f0ede8; font-size:16px; width:36px; height:36px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.sheet-sub { font-size:13px; color:#888; margin-bottom:20px; line-height:1.5; }
+.rfq-box { background:#0e0e0e; border:1px solid #2a2a2a; border-radius:8px; padding:16px; font-family:‘DM Mono’,monospace; font-size:12px; line-height:1.8; color:#f0ede8; white-space:pre-wrap; margin-bottom:16px; word-break:break-word; }
+.modal-actions { display:flex; gap:10px; }
+.copy-btn { flex:1; padding:14px; background:var(–accent); color:#0e0e0e; border:none; border-radius:8px; font-family:‘Syne’,sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:transform 0.15s; }
+.copy-btn:active { transform:scale(0.97); }
+.modal-close-btn { padding:14px 18px; background:#2e2e2e; border:1px solid #555; color:#f0ede8; border-radius:8px; font-family:‘Syne’,sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
 
-/* ══ DETAIL ══ */
-#screen-detail { padding: 0; overflow-y: auto; }
-.detail-header { padding: 44px 24px 24px; border-bottom: 1px solid var(–border); display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-.detail-back { background: none; border: none; color: var(–accent2); font-family: ‘DM Mono’, monospace; font-size: 12px; cursor: pointer; padding: 0; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-top: 2px; }
-.detail-title-block { flex: 1; }
-.detail-title { font-family: ‘Syne’, sans-serif; font-size: 22px; font-weight: 800; color: var(–text); line-height: 1.2; margin-bottom: 12px; }
-.detail-badges { display: flex; gap: 8px; flex-wrap: wrap; }
-.detail-body { padding: 24px; display: flex; flex-direction: column; gap: 24px; padding-bottom: 40px; }
-.detail-section { background: var(–surface); border: 1px solid var(–border); border-radius: 10px; padding: 18px; }
-.detail-section-label { font-family: ‘DM Mono’, monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(–accent2); margin-bottom: 12px; }
-.detail-section-content { font-size: 14px; line-height: 1.7; color: var(–text); }
-.detail-steps { display: flex; flex-direction: column; gap: 12px; }
-.detail-step { display: flex; gap: 14px; align-items: flex-start; }
-.detail-step-num { font-family: ‘DM Mono’, monospace; font-size: 11px; color: var(–accent2); background: var(–surface2); border: 1px solid var(–border); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; margin-top: 1px; }
-.detail-step-text { font-size: 13px; line-height: 1.6; color: var(–text); }
-.cost-display { display: flex; align-items: baseline; gap: 8px; }
-.cost-amount { font-family: ‘Syne’, sans-serif; font-size: 28px; font-weight: 800; color: var(–accent); }
-.cost-label { font-family: ‘DM Mono’, monospace; font-size: 11px; color: var(–muted); }
-.detail-actions { display: flex; flex-direction: column; gap: 10px; }
-.action-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 8px; font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: transform 0.15s; }
-.action-btn:active { transform: scale(0.97); }
-.action-btn.primary { background: var(–accent); color: #0e0e0e; }
-.action-btn.secondary { background: #2e2e2e; border: 1px solid #555; color: #f0ede8; }
-.action-btn.update { background: #1a2a1a; border: 1px solid #4a7a4a; color: #6fc78a; }
-.action-btn.danger { background: #2a1a1a; border: 1px solid #7a3a3a; color: #e05c5c; }
-
-/* ══ UPDATE MODAL ══ */
-.update-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: none; align-items: flex-end; }
-.update-modal.open { display: flex; }
-.update-sheet { width: 100%; background: #1a1a1a; border-top: 1px solid #333; border-radius: 20px 20px 0 0; padding: 24px 24px 48px; animation: sheetUp 0.3s cubic-bezier(0.32,0.72,0,1); max-height: 80vh; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
-.update-sheet-header { display: flex; align-items: center; justify-content: space-between; }
-.update-sheet-title { font-family: ‘Syne’, sans-serif; font-size: 18px; font-weight: 800; color: #f0ede8; }
-.sheet-close-btn { background: #2e2e2e; border: 1px solid #555; color: #f0ede8; font-size: 16px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-/* ══ RFQ MODAL ══ */
-@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-@keyframes modalPop { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; display: none; align-items: center; justify-content: center; padding: 24px; }
-.modal-overlay.open { display: flex; }
-.modal-sheet { width: 100%; max-width: 480px; background: #1a1a1a; border: 1px solid #333; border-radius: 16px; padding: 24px; animation: modalPop 0.25s ease; max-height: 85vh; overflow-y: auto; }
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-.sheet-handle { display: none; }
-.sheet-title { font-family: ‘Syne’, sans-serif; font-size: 20px; font-weight: 800; color: #f0ede8; }
-.sheet-sub { font-size: 13px; color: #888; margin-bottom: 20px; line-height: 1.5; margin-top: 4px; }
-.rfq-box { background: #0e0e0e; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; font-family: ‘DM Mono’, monospace; font-size: 12px; line-height: 1.8; color: #f0ede8; white-space: pre-wrap; margin-bottom: 16px; word-break: break-word; }
-.modal-actions { display: flex; gap: 10px; }
-.copy-btn { flex: 1; padding: 14px; background: var(–accent); color: #0e0e0e; border: none; border-radius: 8px; font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.15s; }
-.copy-btn:active { transform: scale(0.97); }
-.modal-close-btn { padding: 14px 18px; background: #2e2e2e; border: 1px solid #555; color: #f0ede8; border-radius: 8px; font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
-
-/* ══ TOAST ══ */
-.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(–ok); color: #0e0e0e; font-family: ‘DM Mono’, monospace; font-size: 12px; font-weight: 500; padding: 10px 20px; border-radius: 100px; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 200; white-space: nowrap; }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.error { background: var(–danger); color: white; }
+/* TOAST */
+.toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%) translateY(20px); background:var(–ok); color:#0e0e0e; font-family:‘DM Mono’,monospace; font-size:12px; font-weight:500; padding:10px 20px; border-radius:100px; opacity:0; transition:opacity 0.2s,transform 0.2s; pointer-events:none; z-index:200; white-space:nowrap; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.error { background:var(–danger); color:white; }
 </style>
 
 </head>
 <body>
 
-<!-- ══ LANDING ══ -->
+<!-- LANDING -->
 
 <div class="screen active" id="screen-landing">
   <div class="landing-hero">
     <div class="landing-eyebrow">Home Maintenance, Simplified</div>
     <h1 class="landing-title">Done.<span>Finally.</span></h1>
-    <p class="landing-tagline">
-      <strong>Point. Speak. Done.</strong><br>
-      Turn home repair chaos into a clean, prioritized, executable plan — in one tap.
-    </p>
-    <button class="btn-primary" onclick="showScreen('screen-record')">
-      Try the Demo <span class="arrow">→</span>
-    </button>
+    <p class="landing-tagline"><strong>Point. Speak. Done.</strong><br>Turn home repair chaos into a clean, prioritized, executable plan — in one tap.</p>
+    <button class="btn-primary" onclick="showRecordScreen()">Try the Demo <span class="arrow">→</span></button>
   </div>
   <div class="landing-divider"></div>
   <div class="landing-section">
     <div class="section-label">How it works</div>
     <div class="steps-list">
-      <div class="step"><div class="step-num">1</div><div class="step-text">Hold the record button and describe your problem out loud.<em>No forms. No typing. Just speak.</em></div></div>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Hold the button, point your camera at the problem, and describe it out loud.<em>No forms. No typing. Just speak.</em></div></div>
       <div class="step"><div class="step-num">2</div><div class="step-text">AI instantly diagnoses the issue and adds it to your task list.<em>Urgency, cost estimate, DIY or hire — all automatic.</em></div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-text">Choose your path: fix it yourself, defer it, or generate a full contractor RFQ in one tap.<em>Your home, your call.</em></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Fix it yourself, defer it, or generate a full contractor RFQ in one tap.<em>Your home, your call.</em></div></div>
     </div>
   </div>
   <div class="landing-divider"></div>
   <div class="landing-section">
     <div class="section-label">What you get</div>
     <div class="features-grid">
-      <div class="feature-card"><span class="feature-icon">🧠</span><div class="feature-title">AI Diagnosis</div><div class="feature-desc">Describes the issue, identifies root causes, flags safety risks, and estimates realistic repair costs — automatically.</div></div>
-      <div class="feature-card"><span class="feature-icon">📋</span><div class="feature-title">Living Task List</div><div class="feature-desc">Every repair, ranked by urgency. Never forget a job again.</div></div>
-      <div class="feature-card"><span class="feature-icon">🔨</span><div class="feature-title">DIY Guides</div><div class="feature-desc">Clear step-by-step instructions written for your specific issue.</div></div>
-      <div class="feature-card"><span class="feature-icon">📤</span><div class="feature-title">Contractor RFQ</div><div class="feature-desc">One tap generates a complete job brief — ready to send.</div></div>
+      <div class="feature-card"><span class="feature-icon">🧠</span><div class="feature-title">AI Diagnosis</div><div class="feature-desc">Identifies root causes, flags safety risks, and estimates repair costs automatically.</div></div>
+      <div class="feature-card"><span class="feature-icon">📋</span><div class="feature-title">Living Task List</div><div class="feature-desc">Every repair, ranked by urgency.</div></div>
+      <div class="feature-card"><span class="feature-icon">🔨</span><div class="feature-title">DIY Guides</div><div class="feature-desc">Step-by-step instructions for your specific issue.</div></div>
+      <div class="feature-card"><span class="feature-icon">📤</span><div class="feature-title">Contractor RFQ</div><div class="feature-desc">One tap generates a complete job brief.</div></div>
     </div>
   </div>
   <div class="landing-cta-bottom">
-    <button class="btn-primary" onclick="showScreen('screen-record')">Start Your Home Log <span class="arrow">→</span></button>
-    <p class="privacy-note">No account needed to try. Tasks saved to your property log.</p>
+    <button class="btn-primary" onclick="showRecordScreen()">Start Your Home Log <span class="arrow">→</span></button>
+    <p class="privacy-note">No account needed. Tasks saved to your property log.</p>
   </div>
 </div>
 
-<!-- ══ RECORD ══ -->
+<!-- RECORD - CAMERA LAYOUT -->
 
 <div class="screen" id="screen-record">
-  <div class="record-header">
-    <button class="back-btn" onclick="showScreen('screen-tasks')">← Tasks</button>
-    <div class="record-screen-label">New Issue</div>
+  <div class="record-top-bar">
+    <button class="back-btn" onclick="goBackFromRecord()">← Back</button>
+    <div class="record-top-label" id="record-mode-label">New Issue</div>
     <div style="width:64px"></div>
   </div>
-  <div class="record-center">
-    <div class="record-instructions" id="record-instructions">
-      What's the problem?
-      <span class="sub">Hold the button and describe it out loud</span>
-    </div>
-    <div class="waveform-container" id="waveform">
-      <div class="wave-bar" style="--peak:18px"></div><div class="wave-bar" style="--peak:28px"></div>
-      <div class="wave-bar" style="--peak:38px"></div><div class="wave-bar" style="--peak:48px"></div>
-      <div class="wave-bar" style="--peak:32px"></div><div class="wave-bar" style="--peak:52px"></div>
-      <div class="wave-bar" style="--peak:44px"></div><div class="wave-bar" style="--peak:36px"></div>
-      <div class="wave-bar" style="--peak:52px"></div><div class="wave-bar" style="--peak:46px"></div>
-      <div class="wave-bar" style="--peak:52px"></div><div class="wave-bar" style="--peak:46px"></div>
-      <div class="wave-bar" style="--peak:52px"></div><div class="wave-bar" style="--peak:36px"></div>
-      <div class="wave-bar" style="--peak:44px"></div><div class="wave-bar" style="--peak:52px"></div>
-      <div class="wave-bar" style="--peak:32px"></div><div class="wave-bar" style="--peak:48px"></div>
-      <div class="wave-bar" style="--peak:38px"></div><div class="wave-bar" style="--peak:28px"></div>
-    </div>
-    <div class="record-btn-wrap" id="record-btn-wrap">
-      <div class="record-ring"></div>
-      <div class="record-ring"></div>
-      <div class="record-ring"></div>
-      <button class="record-btn" id="record-btn"
+  <div class="camera-off-placeholder" id="camera-placeholder">
+    <div class="camera-off-icon">📷</div>
+    <div class="camera-off-text">Camera loading…</div>
+  </div>
+  <video class="camera-viewport" id="camera-feed" autoplay muted playsinline></video>
+  <canvas id="capture-canvas" style="display:none"></canvas>
+  <div class="frame-counter" id="frame-counter">0 frames</div>
+  <div class="cam-waveform" id="cam-waveform">
+    <div class="cam-wave-bar" style="--peak:10px"></div>
+    <div class="cam-wave-bar" style="--peak:18px"></div>
+    <div class="cam-wave-bar" style="--peak:28px"></div>
+    <div class="cam-wave-bar" style="--peak:36px"></div>
+    <div class="cam-wave-bar" style="--peak:28px"></div>
+    <div class="cam-wave-bar" style="--peak:36px"></div>
+    <div class="cam-wave-bar" style="--peak:28px"></div>
+    <div class="cam-wave-bar" style="--peak:18px"></div>
+    <div class="cam-wave-bar" style="--peak:10px"></div>
+  </div>
+  <div class="record-text-overlay">
+    <textarea id="text-input" placeholder="Hold the button and speak — or type here…" rows="2"></textarea>
+  </div>
+  <div class="record-bottom-bar">
+    <div style="position:relative">
+      <button class="rec-btn" id="record-btn"
         ontouchstart="startRecording(event)" ontouchend="stopRecording(event)"
         onmousedown="startRecording(event)" onmouseup="stopRecording(event)">
-        <div class="record-btn-inner"></div>
+        <div class="rec-btn-inner"></div>
       </button>
+      <div class="rec-timer" id="record-timer"></div>
     </div>
-    <div class="record-timer" id="record-timer"></div>
-    <div class="transcript-preview" id="transcript-preview">Listening…</div>
-    <div class="text-input-wrap" id="text-input-wrap">
-      <textarea class="text-input" id="text-input" placeholder="Describe the issue… e.g. 'The bathroom faucet drips constantly and the handle is loose'" rows="3"></textarea>
-      <button class="submit-text-btn" onclick="submitText()">Diagnose Issue →</button>
-    </div>
+    <button class="rec-submit-btn" onclick="submitText()">Diagnose Issue →</button>
   </div>
-  <div class="record-hint" id="record-hint">Hold to speak &nbsp;·&nbsp; Release to process</div>
 </div>
 
-<!-- ══ PROCESSING ══ -->
+<!-- PROCESSING -->
 
 <div class="screen" id="screen-processing">
   <div class="processing-orb"></div>
@@ -320,43 +266,48 @@ z-index: 0;
   <div class="processing-steps">
     <div class="proc-step" id="proc-1"><div class="dot"></div>Analyzing description</div>
     <div class="proc-step" id="proc-2"><div class="dot"></div>Identifying root causes</div>
-    <div class="proc-step" id="proc-3"><div class="dot"></div>Estimating cost & urgency</div>
+    <div class="proc-step" id="proc-3"><div class="dot"></div>Estimating cost &amp; urgency</div>
     <div class="proc-step" id="proc-4"><div class="dot"></div>Saving to your home log</div>
   </div>
 </div>
 
-<!-- ══ TASKS ══ -->
+<!-- TASKS -->
 
 <div class="screen" id="screen-tasks">
   <div class="tasks-header">
     <div class="tasks-header-top">
       <div class="tasks-title"><span>Your Property</span>Home Tasks</div>
-      <button class="add-task-btn" onclick="showScreen('screen-record')" title="Add new issue">+</button>
+      <button class="add-task-btn" onclick="showRecordScreen()" title="Add new issue">+</button>
     </div>
     <div class="summary-pills">
-      <div class="pill active" data-filter="all" onclick="filterTasks('all', this)">
+      <div class="pill active" data-filter="all" onclick="filterTasks('all',this)">
         <div class="pill-dot" style="background:#666"></div><span class="pill-label">ALL</span><span class="pill-count" id="count-all">0</span>
       </div>
-      <div class="pill" data-filter="urgent" onclick="filterTasks('urgent', this)">
+      <div class="pill" data-filter="urgent" onclick="filterTasks('urgent',this)">
         <div class="pill-dot" style="background:var(--danger)"></div><span class="pill-label">URGENT</span><span class="pill-count" id="count-urgent">0</span>
       </div>
-      <div class="pill" data-filter="soon" onclick="filterTasks('soon', this)">
+      <div class="pill" data-filter="soon" onclick="filterTasks('soon',this)">
         <div class="pill-dot" style="background:var(--warn)"></div><span class="pill-label">SOON</span><span class="pill-count" id="count-soon">0</span>
       </div>
-      <div class="pill" data-filter="low" onclick="filterTasks('low', this)">
+      <div class="pill" data-filter="low" onclick="filterTasks('low',this)">
         <div class="pill-dot" style="background:var(--ok)"></div><span class="pill-label">LOW</span><span class="pill-count" id="count-low">0</span>
       </div>
     </div>
+    <div class="tasks-secondary-row">
+      <button class="view-btn completed-btn" id="btn-completed" onclick="setTaskView('completed')">&#x2713; Completed</button>
+      <button class="view-btn trash-btn" id="btn-trash" onclick="setTaskView('trash')">&#x1F5D1; Trash</button>
+      <button class="view-btn back-btn-view" id="btn-active" onclick="setTaskView('active')" style="display:none">&#x2190; Active</button>
+    </div>
   </div>
   <div class="tasks-list" id="tasks-list"></div>
-  <button class="fab" onclick="showScreen('screen-record')">⏺ Report New Issue</button>
+  <button class="fab" onclick="showRecordScreen()">&#x23FA; Report New Issue</button>
 </div>
 
-<!-- ══ DETAIL ══ -->
+<!-- DETAIL -->
 
 <div class="screen" id="screen-detail">
   <div class="detail-header">
-    <button class="detail-back" onclick="showScreen('screen-tasks')">← Tasks</button>
+    <button class="detail-back" onclick="showScreen('screen-tasks')">&#x2190; Tasks</button>
     <div class="detail-title-block">
       <div class="detail-title" id="detail-title"></div>
       <div class="detail-badges" id="detail-badges"></div>
@@ -379,21 +330,21 @@ z-index: 0;
       <div class="detail-steps" id="detail-steps"></div>
     </div>
     <div class="detail-actions">
-      <button class="action-btn primary" onclick="generateRFQ()">📤 Generate Contractor RFQ</button>
-      <button class="action-btn update" onclick="openUpdateModal()">🎙 Add More Info</button>
-      <button class="action-btn secondary" onclick="markDone()">✓ Mark as Done</button>
-      <button class="action-btn danger" onclick="deleteTask()">Remove Task</button>
+      <button class="action-btn primary" onclick="generateRFQ()">&#x1F4E4; Generate Contractor RFQ</button>
+      <button class="action-btn update" onclick="openUpdateMode()">&#x1F399; Add More Info</button>
+      <button class="action-btn secondary" onclick="markDone()">&#x2713; Mark as Done</button>
+      <button class="action-btn danger" onclick="deleteTask()">Move to Trash</button>
     </div>
   </div>
 </div>
 
-<!-- ══ RFQ MODAL ══ -->
+<!-- RFQ MODAL -->
 
 <div class="modal-overlay" id="rfq-modal" onclick="closeModal()">
   <div class="modal-sheet" onclick="event.stopPropagation()">
     <div class="modal-header">
       <div class="sheet-title">Contractor RFQ</div>
-      <button class="sheet-close-btn" onclick="closeModal()">✕</button>
+      <button class="sheet-close-btn" onclick="closeModal()">&#x2715;</button>
     </div>
     <p class="sheet-sub">Copy and send to local contractors.</p>
     <div class="rfq-box" id="rfq-content"></div>
@@ -404,372 +355,410 @@ z-index: 0;
   </div>
 </div>
 
-<!-- ══ UPDATE TASK MODAL ══ -->
-
-<div class="update-modal" id="update-modal">
-  <div class="update-sheet">
-    <div class="update-sheet-header">
-      <div class="update-sheet-title">Add More Info</div>
-      <button class="sheet-close-btn" onclick="closeUpdateModal()">✕</button>
-    </div>
-    <textarea class="text-input" id="update-input" placeholder="Describe any new findings, changes, or additional details about this issue…" rows="4"></textarea>
-    <button class="action-btn primary" onclick="submitUpdate()" style="margin-top:4px">Update Diagnosis →</button>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════
-// CONFIG — update TOKEN to match your .env API_TOKEN
-// ═══════════════════════════════════════
-const API_TOKEN    = 'REPLACE_WITH_YOUR_API_TOKEN';
-const PROPERTY_ID  = 'david-home';
-const API_BASE     = '/api';
+const API_TOKEN = 'REPLACE_WITH_YOUR_API_TOKEN';
+const PROPERTY_ID = 'david-home';
+const API_BASE = '/api';
 
-// ═══════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════
-let tasks = [];
-let currentFilter = 'all';
-let activeTaskId = null;
-let recognition = null;
-let isRecording = false;
-let recordTimer = null;
-let recordSeconds = 0;
-let finalTranscript = '';
-let speechSupported = false;
+let tasks = [], completedTasks = [], trashedTasks = [];
+let currentFilter = 'all', taskView = 'active', activeTaskId = null;
+let recognition = null, isRecording = false, recordTimer = null, recordSeconds = 0;
+let finalTranscript = '', speechSupported = false;
+let cameraStream = null, frameInterval = null;
+let capturedFrames = [], recordStartTime = 0, isUpdateMode = false;
 
-// ═══════════════════════════════════════
-// API HELPERS
-// ═══════════════════════════════════════
-async function apiFetch(path, options = {}) {
-  const res = await fetch(API_BASE + path, {
+// API
+async function apiFetch(path, options={}) {
+  const res = await fetch(API_BASE+path, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Token': API_TOKEN,
-      ...(options.headers || {})
-    }
+    headers: { 'Content-Type':'application/json', 'X-Token':API_TOKEN, ...(options.headers||{}) }
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(err.error || res.statusText);
-  }
+  if (!res.ok) { const e = await res.json().catch(()=>({error:res.statusText})); throw new Error(e.error||res.statusText); }
   return res.json();
 }
 
 async function loadTasksFromServer() {
   try {
     const data = await apiFetch(`/done/tasks?property_id=${PROPERTY_ID}`);
-    tasks = data.tasks || [];
-    // Also cache locally
-    localStorage.setItem('done_tasks_cache', JSON.stringify(tasks));
-  } catch (e) {
-    console.warn('Server load failed, using cache:', e);
-    tasks = JSON.parse(localStorage.getItem('done_tasks_cache') || '[]');
+    const all = data.tasks || [];
+    tasks = all.filter(t => !t.status || t.status === 'open');
+    completedTasks = all.filter(t => t.status === 'completed');
+    trashedTasks = all.filter(t => t.status === 'trashed');
+    localStorage.setItem('done_tasks_cache', JSON.stringify(all));
+  } catch(e) {
+    const all = JSON.parse(localStorage.getItem('done_tasks_cache')||'[]');
+    tasks = all.filter(t => !t.status || t.status === 'open');
+    completedTasks = all.filter(t => t.status === 'completed');
+    trashedTasks = all.filter(t => t.status === 'trashed');
   }
 }
 
-async function deleteTaskOnServer(id) {
+async function updateTaskStatusOnServer(id, action) {
   await apiFetch(`/done/tasks?property_id=${PROPERTY_ID}`, {
-    method: 'POST',
-    body: JSON.stringify({ action: 'delete', id })
+    method:'POST', body:JSON.stringify({action, id})
   });
 }
 
-// ═══════════════════════════════════════
-// SCREEN NAVIGATION
-// ═══════════════════════════════════════
+function saveCache() {
+  localStorage.setItem('done_tasks_cache', JSON.stringify([...tasks,...completedTasks,...trashedTasks]));
+}
+
+// SCREENS
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
+  window.scrollTo(0,0);
   if (id === 'screen-tasks') renderTaskList();
-  if (id === 'screen-record') resetRecord();
+  if (id !== 'screen-record') stopCamera();
 }
 
-// ═══════════════════════════════════════
-// SPEECH RECOGNITION
-// ═══════════════════════════════════════
+function showRecordScreen(updateMode=false) {
+  isUpdateMode = updateMode;
+  document.getElementById('record-mode-label').textContent = updateMode ? 'Add More Info' : 'New Issue';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-record').classList.add('active');
+  resetRecord();
+  startCamera();
+}
+
+function goBackFromRecord() {
+  stopCamera();
+  if (isUpdateMode) { showScreen('screen-detail'); }
+  else { showScreen(tasks.length > 0 ? 'screen-tasks' : 'screen-landing'); }
+}
+
+function openUpdateMode() {
+  showRecordScreen(true);
+}
+
+// SPEECH
 function setupSpeech() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    document.getElementById('text-input-wrap').classList.add('visible');
-    document.getElementById('record-hint').textContent = 'Voice not supported — type your issue below';
-    return;
-  }
+  if (!SR) return;
   speechSupported = true;
   recognition = new SR();
   recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = 'en-US';
-
   recognition.onresult = (e) => {
     let interim = '';
     finalTranscript = '';
-    for (let i = 0; i < e.results.length; i++) {
+    for (let i=0;i<e.results.length;i++) {
       const t = e.results[i][0].transcript;
       if (e.results[i].isFinal) finalTranscript += t + ' ';
       else interim += t;
     }
-    const display = (finalTranscript + interim).trim();
-    if (display) {
-      const textInput = document.getElementById('text-input');
-      textInput.value = display;
-    }
+    const display = (finalTranscript+interim).trim();
+    if (display) document.getElementById('text-input').value = display;
   };
-
-  recognition.onerror = (e) => {
-    if (e.error === 'not-allowed') {
-      document.getElementById('text-input-wrap').classList.add('visible');
-      document.getElementById('record-hint').textContent = 'Mic not available — type your issue below';
-    }
-  };
+  recognition.onerror = () => {};
 }
 
-// ═══════════════════════════════════════
 // RECORDING
-// ═══════════════════════════════════════
 function startRecording(e) {
   e.preventDefault();
   if (isRecording) return;
   isRecording = true;
   finalTranscript = '';
-
-  const btn = document.getElementById('record-btn');
-  const wrap = document.getElementById('record-btn-wrap');
-  const waveform = document.getElementById('waveform');
-  const textWrap = document.getElementById('text-input-wrap');
-  const textInput = document.getElementById('text-input');
-
-  btn.classList.add('recording');
-  wrap.classList.add('recording');
-  waveform.classList.add('active');
-
-  // Always show text box immediately — speech fills it, user can edit
-  textWrap.classList.add('visible');
-  textInput.value = '';
-  textInput.placeholder = 'Listening… speak now, or type here';
-  document.getElementById('record-instructions').innerHTML = 'Listening…<span class="sub">Release when done — edit text if needed</span>';
-
-  if (speechSupported && recognition) { try { recognition.start(); } catch(err) {} }
-
+  capturedFrames = [];
+  recordStartTime = Date.now();
+  document.getElementById('record-btn').classList.add('recording');
+  document.getElementById('cam-waveform').classList.add('active');
+  document.getElementById('frame-counter').classList.add('active');
+  document.getElementById('text-input').value = '';
+  document.getElementById('text-input').placeholder = 'Listening…';
+  if (speechSupported && recognition) { try { recognition.start(); } catch(err){} }
+  frameInterval = setInterval(captureFrame, 1000);
   recordSeconds = 0;
   updateTimer();
-  recordTimer = setInterval(() => {
-    recordSeconds++;
-    updateTimer();
-    if (recordSeconds >= 60) stopRecording();
-  }, 1000);
+  recordTimer = setInterval(() => { recordSeconds++; updateTimer(); if(recordSeconds>=60) stopRecording(); }, 1000);
 }
 
 function stopRecording(e) {
   if (e) e.preventDefault();
   if (!isRecording) return;
   isRecording = false;
-
   document.getElementById('record-btn').classList.remove('recording');
-  document.getElementById('record-btn-wrap').classList.remove('recording');
-  document.getElementById('waveform').classList.remove('active');
+  document.getElementById('cam-waveform').classList.remove('active');
+  document.getElementById('frame-counter').classList.remove('active');
   clearInterval(recordTimer);
+  clearInterval(frameInterval);
+  frameInterval = null;
   document.getElementById('record-timer').textContent = '';
-
-  if (speechSupported && recognition) { try { recognition.stop(); } catch(err) {} }
-
-  const textInput = document.getElementById('text-input');
-  // If speech filled the box, use it; otherwise leave box open for typing
-  const boxText = textInput.value.trim();
-  const transcript = finalTranscript.trim() || boxText;
-
+  if (speechSupported && recognition) { try { recognition.stop(); } catch(err){} }
+  const ti = document.getElementById('text-input');
+  const transcript = finalTranscript.trim() || ti.value.trim();
   if (transcript.length > 3) {
-    // Put transcript in box so user can review/edit before submitting
-    textInput.value = transcript;
-    textInput.placeholder = 'Edit if needed, then tap Diagnose';
-    document.getElementById('record-instructions').innerHTML = "Review & submit<span class='sub'>Edit the text above if needed</span>";
+    ti.value = transcript;
+    ti.placeholder = 'Edit if needed, then tap Diagnose';
   } else {
-    textInput.placeholder = 'Describe the issue here…';
-    document.getElementById('record-instructions').innerHTML = "What's the problem?<span class='sub'>Type or hold button to speak again</span>";
+    ti.placeholder = 'Speak or type the issue…';
   }
 }
 
 function updateTimer() {
   const m = Math.floor(recordSeconds/60).toString().padStart(2,'0');
   const s = (recordSeconds%60).toString().padStart(2,'0');
-  document.getElementById('record-timer').textContent = `${m}:${s}`;
+  document.getElementById('record-timer').textContent = m+':'+s;
 }
 
 function resetRecord() {
   isRecording = false;
   finalTranscript = '';
+  capturedFrames = [];
   clearInterval(recordTimer);
+  clearInterval(frameInterval);
+  frameInterval = null;
   document.getElementById('record-btn').classList.remove('recording');
-  document.getElementById('record-btn-wrap').classList.remove('recording');
-  document.getElementById('waveform').classList.remove('active');
+  document.getElementById('cam-waveform').classList.remove('active');
+  document.getElementById('frame-counter').classList.remove('active');
   document.getElementById('record-timer').textContent = '';
-  document.getElementById('transcript-preview').className = 'transcript-preview';
-  document.getElementById('transcript-preview').textContent = 'Listening…';
-  document.getElementById('text-input-wrap').classList.remove('visible');
   document.getElementById('text-input').value = '';
-  document.getElementById('record-instructions').innerHTML = "What's the problem?<span class='sub'>Hold the button and describe it out loud</span>";
-  document.getElementById('record-hint').textContent = 'Hold to speak · Release to process';
+  document.getElementById('text-input').placeholder = 'Hold the button and speak — or type here…';
 }
 
 function submitText() {
   const text = document.getElementById('text-input').value.trim();
-  if (text.length < 5) { showToast('Please describe the issue — speak or type it'); return; }
-  processTranscript(text);
+  if (text.length < 5) { showToast('Please describe the issue'); return; }
+  stopCamera();
+  if (isUpdateMode) submitUpdate(text);
+  else processTranscript(text);
 }
 
-// ═══════════════════════════════════════
-// DIAGNOSIS VIA PROXY
-// ═══════════════════════════════════════
+// CAMERA
+async function startCamera() {
+  const ph = document.getElementById('camera-placeholder');
+  if (ph) ph.style.display = 'flex';
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode:'environment', width:{ideal:1280}, height:{ideal:720} },
+      audio: false
+    });
+    cameraStream = stream;
+    const video = document.getElementById('camera-feed');
+    video.srcObject = stream;
+    await video.play();
+    if (ph) ph.style.display = 'none';
+  } catch(e) {
+    const t = document.querySelector('.camera-off-text');
+    if (t) t.textContent = 'Camera unavailable';
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t=>t.stop()); cameraStream = null; }
+  clearInterval(frameInterval); frameInterval = null;
+  const video = document.getElementById('camera-feed');
+  if (video) video.srcObject = null;
+  const ph = document.getElementById('camera-placeholder');
+  if (ph) ph.style.display = 'flex';
+}
+
+function captureFrame() {
+  const video = document.getElementById('camera-feed');
+  const canvas = document.getElementById('capture-canvas');
+  if (!video || video.readyState < 2 || !video.videoWidth) return;
+  const scale = 640 / video.videoWidth;
+  canvas.width = 640;
+  canvas.height = Math.round(video.videoHeight * scale);
+  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+  const timestamp = Date.now() - recordStartTime;
+  const transcriptAtTime = document.getElementById('text-input').value || finalTranscript;
+  capturedFrames.push({timestamp, dataUrl, transcriptAtTime});
+  if (capturedFrames.length > 20) capturedFrames.shift();
+  const fc = document.getElementById('frame-counter');
+  if (fc) fc.textContent = capturedFrames.length + ' frame' + (capturedFrames.length !== 1 ? 's' : '');
+}
+
+// API CALLS
 async function processTranscript(transcript) {
   showScreen('screen-processing');
   animateProcessingSteps();
-
   try {
     const task = await apiFetch('/done/diagnose', {
-      method: 'POST',
-      body: JSON.stringify({ transcript, property_id: PROPERTY_ID })
+      method:'POST',
+      body:JSON.stringify({transcript, property_id:PROPERTY_ID})
     });
-
-    // Update local cache
+    task.status = 'open';
     tasks.unshift(task);
-    localStorage.setItem('done_tasks_cache', JSON.stringify(tasks));
-
+    saveCache();
     activeTaskId = task.id;
-
-    setTimeout(() => {
-      showScreen('screen-tasks');
-      setTimeout(() => openDetail(task.id), 300);
-    }, 600);
-
-  } catch (err) {
-    console.error('Diagnose error:', err);
+    setTimeout(() => { showScreen('screen-tasks'); setTimeout(()=>openDetail(task.id),300); }, 600);
+  } catch(err) {
     showScreen('screen-record');
-    showToast('Could not diagnose — ' + (err.message || 'please try again'), true);
+    showToast('Could not diagnose — '+( err.message||'please try again'), true);
+  }
+}
+
+async function submitUpdate(extraText) {
+  const task = tasks.find(t=>t.id===activeTaskId);
+  if (!task) return;
+  showScreen('screen-processing');
+  animateProcessingSteps();
+  try {
+    const combined = task.transcript + '. Additional info: ' + extraText;
+    const updated = await apiFetch('/done/diagnose', {
+      method:'POST',
+      body:JSON.stringify({transcript:combined, property_id:PROPERTY_ID})
+    });
+    updated.id = task.id;
+    updated.status = 'open';
+    tasks = tasks.map(t=>t.id===task.id?updated:t);
+    saveCache();
+    activeTaskId = updated.id;
+    setTimeout(() => { showScreen('screen-tasks'); setTimeout(()=>openDetail(updated.id),300); }, 600);
+    showToast('Task updated');
+  } catch(e) {
+    showScreen('screen-detail');
+    showToast('Update failed: '+e.message, true);
   }
 }
 
 function animateProcessingSteps() {
-  const steps = ['proc-1','proc-2','proc-3','proc-4'];
-  steps.forEach((id, i) => {
-    const el = document.getElementById(id);
+  const steps=['proc-1','proc-2','proc-3','proc-4'];
+  steps.forEach((id,i) => {
+    const el=document.getElementById(id);
     el.classList.remove('visible','done');
-    setTimeout(() => {
-      el.classList.add('visible');
-      if (i > 0) document.getElementById(steps[i-1]).classList.add('done');
-    }, i * 700 + 200);
+    setTimeout(()=>{ el.classList.add('visible'); if(i>0) document.getElementById(steps[i-1]).classList.add('done'); }, i*700+200);
   });
 }
 
-// ═══════════════════════════════════════
 // TASK LIST
-// ═══════════════════════════════════════
+function setTaskView(view) {
+  taskView = view;
+  const btnActive = document.getElementById('btn-active');
+  const btnCompleted = document.getElementById('btn-completed');
+  const btnTrash = document.getElementById('btn-trash');
+  btnActive.style.display = view==='active' ? 'none' : '';
+  btnCompleted.classList.toggle('active-view', view==='completed');
+  btnTrash.classList.toggle('active-view', view==='trash');
+  renderTaskList();
+}
+
 function filterTasks(filter, pill) {
   currentFilter = filter;
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  taskView = 'active';
+  document.getElementById('btn-active').style.display='none';
+  document.getElementById('btn-completed').classList.remove('active-view');
+  document.getElementById('btn-trash').classList.remove('active-view');
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
   pill.classList.add('active');
   renderTaskList();
 }
 
 function renderTaskList() {
   const list = document.getElementById('tasks-list');
+  document.getElementById('count-all').textContent = tasks.length;
+  document.getElementById('count-urgent').textContent = tasks.filter(t=>t.urgency>=4).length;
+  document.getElementById('count-soon').textContent = tasks.filter(t=>t.urgency===3).length;
+  document.getElementById('count-low').textContent = tasks.filter(t=>t.urgency<=2).length;
 
-  document.getElementById('count-all').textContent    = tasks.length;
-  document.getElementById('count-urgent').textContent = tasks.filter(t => t.urgency >= 4).length;
-  document.getElementById('count-soon').textContent   = tasks.filter(t => t.urgency === 3).length;
-  document.getElementById('count-low').textContent    = tasks.filter(t => t.urgency <= 2).length;
-
-  let filtered = tasks;
-  if (currentFilter === 'urgent') filtered = tasks.filter(t => t.urgency >= 4);
-  if (currentFilter === 'soon')   filtered = tasks.filter(t => t.urgency === 3);
-  if (currentFilter === 'low')    filtered = tasks.filter(t => t.urgency <= 2);
-
-  if (filtered.length === 0) {
-    list.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">🏠</div>
-      <div class="empty-title">${tasks.length === 0 ? 'No tasks yet' : 'Nothing here'}</div>
-      <div class="empty-sub">${tasks.length === 0 ? 'Tap the button below to report your first issue' : 'No tasks in this category'}</div>
-    </div>`;
+  if (taskView === 'trash') {
+    if (!trashedTasks.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">&#x1F5D1;</div><div class="empty-title">Trash is empty</div></div>'; return; }
+    list.innerHTML = '<div class="trash-actions"><button class="purge-btn" onclick="emptyTrash()">Empty Trash</button></div>' +
+      trashedTasks.map((t,i)=>`<div class="task-card" style="animation-delay:${i*0.04}s">
+        <div class="task-card-top"><div class="task-name">${esc(t.title)}</div><button class="card-restore-btn" onclick="restoreTask('${t.id}','trashed')">Restore</button></div>
+        <div class="task-meta"><div class="task-meta-item">&#x1F4B0; $${t.cost_min}&#x2013;$${t.cost_max}</div><div class="task-meta-item" style="margin-left:auto;font-size:10px">${esc(t.date)}</div></div>
+      </div>`).join('');
     return;
   }
 
-  list.innerHTML = filtered.map((t, i) => `
-    <div class="task-card" style="animation-delay:${i * 0.04}s" onclick="openDetail('${t.id}')">
-      <div class="task-card-top">
-        <div class="task-name">${esc(t.title)}</div>
-        <div class="urgency-badge urgency-${t.urgency}">${esc(t.urgency_label)}</div>
-      </div>
-      <div class="task-meta">
-        <div class="task-meta-item">💰 $${t.cost_min}–$${t.cost_max}</div>
-        <div class="task-type-badge">${esc(t.type)}</div>
-        <div class="task-meta-item" style="margin-left:auto; font-size:10px;">${esc(t.date)}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function openDetail(id) {
-  const task = tasks.find(t => t.id === id);
-  if (!task) return;
-  activeTaskId = id;
-
-  document.getElementById('detail-title').textContent = task.title;
-  document.getElementById('detail-badges').innerHTML = `
-    <div class="urgency-badge urgency-${task.urgency}">${esc(task.urgency_label)}</div>
-    <div class="task-type-badge">${esc(task.type)}</div>
-    ${task.safety_flag ? '<div class="urgency-badge urgency-5">⚠ Safety Risk</div>' : ''}
-  `;
-  document.getElementById('detail-diagnosis').textContent = task.diagnosis;
-  document.getElementById('detail-cost').textContent = `$${task.cost_min}–$${task.cost_max}`;
-  document.getElementById('detail-cost-label').textContent = task.cost_note || '';
-
-  const stepsContainer = document.getElementById('detail-steps');
-  if (task.steps && task.steps.length) {
-    stepsContainer.innerHTML = task.steps.map((s, i) => `
-      <div class="detail-step">
-        <div class="detail-step-num">${i+1}</div>
-        <div class="detail-step-text">${esc(s)}</div>
-      </div>`).join('');
-    document.getElementById('detail-steps-section').style.display = '';
-  } else {
-    document.getElementById('detail-steps-section').style.display = 'none';
+  if (taskView === 'completed') {
+    if (!completedTasks.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">&#x2713;</div><div class="empty-title">No completed tasks yet</div></div>'; return; }
+    list.innerHTML = completedTasks.map((t,i)=>`<div class="task-card" style="animation-delay:${i*0.04}s;opacity:0.75">
+      <div class="task-card-top"><div class="task-name">${esc(t.title)}</div><button class="card-restore-btn" onclick="restoreTask('${t.id}','completed')">Restore</button></div>
+      <div class="task-meta"><div class="task-meta-item">&#x1F4B0; $${t.cost_min}&#x2013;$${t.cost_max}</div><div class="task-meta-item" style="margin-left:auto;font-size:10px">${esc(t.date)}</div></div>
+    </div>`).join('');
+    return;
   }
 
+  let filtered = tasks;
+  if (currentFilter==='urgent') filtered=tasks.filter(t=>t.urgency>=4);
+  if (currentFilter==='soon') filtered=tasks.filter(t=>t.urgency===3);
+  if (currentFilter==='low') filtered=tasks.filter(t=>t.urgency<=2);
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">&#x1F3E0;</div><div class="empty-title">${tasks.length===0?'No tasks yet':'Nothing here'}</div><div class="empty-sub">${tasks.length===0?'Tap + to report your first issue':'No tasks in this category'}</div></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map((t,i)=>`
+    <div class="task-card" style="animation-delay:${i*0.04}s" onclick="openDetail('${t.id}')">
+      <div class="task-card-top"><div class="task-name">${esc(t.title)}</div><div class="urgency-badge urgency-${t.urgency}">${esc(t.urgency_label)}</div></div>
+      <div class="task-meta"><div class="task-meta-item">&#x1F4B0; $${t.cost_min}&#x2013;$${t.cost_max}</div><div class="task-type-badge">${esc(t.type)}</div><div class="task-meta-item" style="margin-left:auto;font-size:10px">${esc(t.date)}</div></div>
+    </div>`).join('');
+}
+
+// DETAIL
+function openDetail(id) {
+  const task = tasks.find(t=>t.id===id);
+  if (!task) return;
+  activeTaskId = id;
+  document.getElementById('detail-title').textContent = task.title;
+  document.getElementById('detail-badges').innerHTML =
+    `<div class="urgency-badge urgency-${task.urgency}">${esc(task.urgency_label)}</div>
+     <div class="task-type-badge">${esc(task.type)}</div>
+     ${task.safety_flag ? '<div class="urgency-badge urgency-5">&#x26A0; Safety Risk</div>' : ''}`;
+  document.getElementById('detail-diagnosis').textContent = task.diagnosis;
+  document.getElementById('detail-cost').textContent = `$${task.cost_min}&#x2013;$${task.cost_max}`;
+  document.getElementById('detail-cost-label').textContent = task.cost_note||'';
+  const stepsEl = document.getElementById('detail-steps');
+  if (task.steps && task.steps.length) {
+    stepsEl.innerHTML = task.steps.map((s,i)=>`<div class="detail-step"><div class="detail-step-num">${i+1}</div><div class="detail-step-text">${esc(s)}</div></div>`).join('');
+    document.getElementById('detail-steps-section').style.display='';
+  } else { document.getElementById('detail-steps-section').style.display='none'; }
   showScreen('screen-detail');
 }
 
 async function markDone() {
   try {
-    await deleteTaskOnServer(activeTaskId);
-    tasks = tasks.filter(t => t.id !== activeTaskId);
-    localStorage.setItem('done_tasks_cache', JSON.stringify(tasks));
+    await updateTaskStatusOnServer(activeTaskId, 'completed');
+    const t = tasks.find(t=>t.id===activeTaskId);
+    if (t) { t.status='completed'; completedTasks.unshift(t); tasks=tasks.filter(x=>x.id!==activeTaskId); saveCache(); }
     showScreen('screen-tasks');
-    showToast('Task marked as done ✓');
-  } catch(e) {
-    showToast('Error: ' + e.message, true);
-  }
+    showToast('Task completed &#x2713;');
+  } catch(e) { showToast('Error: '+e.message, true); }
 }
 
 async function deleteTask() {
   try {
-    await deleteTaskOnServer(activeTaskId);
-    tasks = tasks.filter(t => t.id !== activeTaskId);
-    localStorage.setItem('done_tasks_cache', JSON.stringify(tasks));
+    await updateTaskStatusOnServer(activeTaskId, 'trashed');
+    const t = tasks.find(t=>t.id===activeTaskId);
+    if (t) { t.status='trashed'; trashedTasks.unshift(t); tasks=tasks.filter(x=>x.id!==activeTaskId); saveCache(); }
     showScreen('screen-tasks');
-    showToast('Task removed');
-  } catch(e) {
-    showToast('Error: ' + e.message, true);
-  }
+    showToast('Moved to trash');
+  } catch(e) { showToast('Error: '+e.message, true); }
 }
 
-// ═══════════════════════════════════════
+async function restoreTask(id, fromStatus) {
+  try {
+    await updateTaskStatusOnServer(id, 'restore');
+    let t;
+    if (fromStatus==='completed') { t=completedTasks.find(x=>x.id===id); completedTasks=completedTasks.filter(x=>x.id!==id); }
+    else { t=trashedTasks.find(x=>x.id===id); trashedTasks=trashedTasks.filter(x=>x.id!==id); }
+    if (t) { t.status='open'; tasks.unshift(t); saveCache(); }
+    renderTaskList();
+    showToast('Task restored');
+  } catch(e) { showToast('Error: '+e.message, true); }
+}
+
+async function emptyTrash() {
+  if (!trashedTasks.length) return;
+  try {
+    await Promise.all(trashedTasks.map(t=>updateTaskStatusOnServer(t.id,'delete')));
+    trashedTasks=[];
+    saveCache();
+    renderTaskList();
+    showToast('Trash emptied');
+  } catch(e) { showToast('Error: '+e.message, true); }
+}
+
 // RFQ
-// ═══════════════════════════════════════
 function generateRFQ() {
-  const task = tasks.find(t => t.id === activeTaskId);
+  const task = tasks.find(t=>t.id===activeTaskId);
   if (!task) return;
   const rfq = `REQUEST FOR QUOTE — Home Repair
 Date: ${task.date}
@@ -777,7 +766,8 @@ Date: ${task.date}
 
 ISSUE: ${task.title}
 PRIORITY: ${task.urgency_label}
-${task.safety_flag ? '⚠ SAFETY RISK — Please prioritize\n' : ''}
+${task.safety_flag?'⚠ SAFETY RISK — Please prioritize
+':''}
 DESCRIPTION:
 ${task.diagnosis}
 
@@ -802,84 +792,34 @@ function closeModal() { document.getElementById('rfq-modal').classList.remove('o
 
 function copyRFQ() {
   navigator.clipboard.writeText(document.getElementById('rfq-content').textContent)
-    .then(() => { showToast('Copied ✓'); closeModal(); })
-    .catch(() => showToast('Select and copy the text above'));
+    .then(()=>{ showToast('Copied &#x2713;'); closeModal(); })
+    .catch(()=>showToast('Select and copy the text above'));
 }
 
-// ═══════════════════════════════════════
 // UTILS
-// ═══════════════════════════════════════
 function esc(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function showToast(msg, isError = false) {
+function showToast(msg, isError=false) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (isError ? ' error' : '');
+  t.innerHTML = msg;
+  t.className = 'toast'+(isError?' error':'');
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  setTimeout(()=>t.classList.remove('show'), 2800);
 }
 
-// ═══════════════════════════════════════
-// UPDATE TASK
-// ═══════════════════════════════════════
-function openUpdateModal() {
-  document.getElementById('update-input').value = '';
-  document.getElementById('update-modal').classList.add('open');
-}
-
-function closeUpdateModal() {
-  document.getElementById('update-modal').classList.remove('open');
-}
-
-async function submitUpdate() {
-  const extra = document.getElementById('update-input').value.trim();
-  if (extra.length < 5) { showToast('Please describe the update'); return; }
-  const task = tasks.find(t => t.id === activeTaskId);
-  if (!task) return;
-  closeUpdateModal();
-  showScreen('screen-processing');
-  animateProcessingSteps();
-  try {
-    const combined = task.transcript + '. Additional info: ' + extra;
-    const updated = await apiFetch('/done/diagnose', {
-      method: 'POST',
-      body: JSON.stringify({ transcript: combined, property_id: PROPERTY_ID })
-    });
-    // Replace old task with updated one, keeping same id
-    updated.id = task.id;
-    tasks = tasks.map(t => t.id === task.id ? updated : t);
-    localStorage.setItem('done_tasks_cache', JSON.stringify(tasks));
-    activeTaskId = updated.id;
-    setTimeout(() => {
-      showScreen('screen-tasks');
-      setTimeout(() => openDetail(updated.id), 300);
-    }, 600);
-    showToast('Task updated');
-  } catch(e) {
-    showScreen('screen-detail');
-    showToast('Update failed: ' + e.message, true);
-  }
-}
-
-// ═══════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════
-// Request mic permission once on load so it doesn't prompt mid-recording
-async function requestMicPermission() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    stream.getTracks().forEach(t => t.stop());
-  } catch(e) { /* user denied - text fallback will handle it */ }
-}
-
 setupSpeech();
-requestMicPermission();
 
-(async () => {
+// Pre-request mic permission once
+navigator.mediaDevices?.getUserMedia({audio:true})
+  .then(s=>s.getTracks().forEach(t=>t.stop()))
+  .catch(()=>{});
+
+(async()=>{
   await loadTasksFromServer();
-  if (tasks.length > 0) showScreen('screen-tasks');
+  if (tasks.length>0) showScreen('screen-tasks');
 })();
 </script>
 
