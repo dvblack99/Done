@@ -184,8 +184,27 @@
 .vision-progress-bar-bg { width:100%; height:6px; background:var(–surface2); border-radius:3px; overflow:hidden; }
 .vision-progress-bar { height:100%; background:var(–accent); border-radius:3px; width:0%; transition:width 0.4s ease; }
 .vision-progress-sub { font-family:‘DM Mono’,monospace; font-size:11px; color:var(–muted); letter-spacing:0.06em; }
-</style>
 
+/* CLARIFICATION SCREEN */
+#screen-clarify { padding:0; overflow-y:auto; }
+.clarify-header { padding:44px 24px 20px; border-bottom:1px solid var(–border); }
+.clarify-title { font-family:‘Syne’,sans-serif; font-size:22px; font-weight:800; color:var(–text); margin-bottom:8px; }
+.clarify-sub { font-family:‘DM Mono’,monospace; font-size:12px; color:var(–muted); line-height:1.6; }
+.clarify-body { padding:24px; display:flex; flex-direction:column; gap:24px; padding-bottom:40px; }
+.clarify-question { background:var(–surface); border:1px solid var(–border); border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:12px; }
+.clarify-q-text { font-family:‘Syne’,sans-serif; font-size:15px; font-weight:700; color:var(–text); line-height:1.4; }
+.clarify-choices { display:flex; flex-wrap:wrap; gap:8px; }
+.clarify-choice-btn { font-family:‘DM Mono’,monospace; font-size:12px; padding:8px 14px; border-radius:6px; border:1px solid var(–border); background:var(–surface2); color:var(–text); cursor:pointer; transition:all 0.15s; letter-spacing:0.03em; }
+.clarify-choice-btn.selected { border-color:var(–accent2); background:rgba(196,169,107,0.12); color:var(–accent); }
+.clarify-visual-btn { display:flex; align-items:center; gap:10px; padding:14px 16px; border-radius:8px; border:1px solid #4a7a4a; background:#1a2a1a; color:var(–ok); font-family:‘Syne’,sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:transform 0.15s; width:100%; justify-content:center; }
+.clarify-visual-btn:active { transform:scale(0.97); }
+.clarify-visual-answered { font-family:‘DM Mono’,monospace; font-size:11px; color:var(–ok); display:flex; align-items:center; gap:6px; }
+.clarify-actions { display:flex; flex-direction:column; gap:10px; padding:0 24px 40px; }
+.clarify-diagnose-btn { padding:18px; background:var(–accent); color:#0e0e0e; border:none; border-radius:8px; font-family:‘Syne’,sans-serif; font-size:15px; font-weight:700; cursor:pointer; transition:transform 0.15s; }
+.clarify-diagnose-btn:active { transform:scale(0.97); }
+.clarify-skip-btn { padding:14px; background:none; border:1px solid var(–border); color:var(–muted); border-radius:8px; font-family:‘DM Mono’,monospace; font-size:12px; cursor:pointer; letter-spacing:0.05em; }
+
+</style>
 </head>
 <body>
 
@@ -352,6 +371,20 @@
   </div>
 </div>
 
+<!-- CLARIFY -->
+
+<div class="screen" id="screen-clarify">
+  <div class="clarify-header">
+    <div class="clarify-title">A few quick questions</div>
+    <div class="clarify-sub" id="clarify-sub">Help me give you a more accurate diagnosis and cost estimate.</div>
+  </div>
+  <div class="clarify-body" id="clarify-questions"></div>
+  <div class="clarify-actions">
+    <button class="clarify-diagnose-btn" onclick="submitWithAnswers()">Get Diagnosis &rarr;</button>
+    <button class="clarify-skip-btn" onclick="submitWithAnswers(true)">Skip &mdash; diagnose with what I gave you</button>
+  </div>
+</div>
+
 <!-- RFQ MODAL -->
 
 <div class="modal-overlay" id="rfq-modal" onclick="closeModal()">
@@ -363,9 +396,10 @@
     <p class="sheet-sub">Copy and send to local contractors.</p>
     <div class="rfq-box" id="rfq-content"></div>
     <div class="modal-actions">
-      <button class="copy-btn" onclick="copyRFQ()">Copy to Clipboard</button>
-      <button class="modal-close-btn" onclick="closeModal()">Close</button>
+      <button class="copy-btn" onclick="copyRFQ()">Copy Text</button>
+      <button class="modal-close-btn" onclick="downloadRFQ()">&#x1F4E5; Save HTML</button>
     </div>
+    <button style="width:100%;margin-top:8px;padding:12px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer" onclick="closeModal()">Close</button>
   </div>
 </div>
 
@@ -381,6 +415,16 @@ let currentFilter = 'all', taskView = 'active', activeTaskId = null;
 let recognition = null, isRecording = false, recordTimer = null, recordSeconds = 0;
 let finalTranscript = '', speechSupported = false;
 let cameraStream = null, frameInterval = null;
+let preTypedText = '';
+let pendingQuestions = [];
+let clarifyAnswers = {};
+let originalTranscript = '';
+let originalFrames = [];
+let preTypedText = '';
+let pendingQuestions = [];
+let clarifyAnswers = {};
+let originalTranscript = '';
+let originalFrames = [];
 let capturedFrames = [], recordStartTime = 0, isUpdateMode = false;
 
 // API
@@ -439,8 +483,14 @@ function showRecordScreen(updateMode=false) {
 
 function goBackFromRecord() {
   stopCamera();
-  if (isUpdateMode) { showScreen('screen-detail'); }
-  else { showScreen(tasks.length > 0 ? 'screen-tasks' : 'screen-landing'); }
+  if (window._isClarifyVisual) {
+    window._isClarifyVisual = false;
+    showScreen('screen-clarify');
+  } else if (isUpdateMode) {
+    showScreen('screen-detail');
+  } else {
+    showScreen(tasks.length > 0 ? 'screen-tasks' : 'screen-landing');
+  }
 }
 
 function openUpdateMode() {
@@ -456,20 +506,24 @@ function setupSpeech() {
   recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = 'en-US';
+  // Use non-continuous mode and restart manually - more reliable on iOS
+  recognition.continuous = false;
   recognition.onresult = (e) => {
-    let interim = '';
-    finalTranscript = '';
-    for (let i=0;i<e.results.length;i++) {
-      const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) finalTranscript += t + ' ';
-      else interim += t;
+    let newText = '';
+    for (let i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) newText += e.results[i][0].transcript + ' ';
     }
-    const speechText = (finalTranscript+interim).trim();
-    if (speechText) {
+    if (newText.trim()) {
+      finalTranscript += newText;
       const ti = document.getElementById('text-input');
-      const existing = ti.value.trim();
-      // Append speech to any existing typed text
-      ti.value = existing ? existing + ' ' + speechText : speechText;
+      const combined = (preTypedText ? preTypedText + ' ' : '') + finalTranscript.trim();
+      ti.value = combined;
+    }
+  };
+  recognition.onend = () => {
+    // Auto-restart while recording
+    if (isRecording) {
+      try { recognition.start(); } catch(e) {}
     }
   };
   recognition.onerror = () => {};
@@ -486,9 +540,10 @@ function startRecording(e) {
   document.getElementById('record-btn').classList.add('recording');
   document.getElementById('cam-waveform').classList.add('active');
   document.getElementById('frame-counter').classList.add('active');
-  document.getElementById('text-input').value = '';
+  // Save any text typed before recording
+  preTypedText = document.getElementById('text-input').value.trim();
   document.getElementById('text-input').placeholder = 'Listening...';
-  if (speechSupported && recognition) { try { recognition.start(); } catch(err){} }
+  if (speechSupported && recognition) { finalTranscript = ''; try { recognition.start(); } catch(err){} }
   frameInterval = setInterval(captureFrame, 1000);
   recordSeconds = 0;
   updateTimer();
@@ -536,6 +591,7 @@ function resetRecord() {
   document.getElementById('record-timer').textContent = '';
   document.getElementById('text-input').value = '';
   document.getElementById('text-input').placeholder = 'Hold the button and speak -- or type here...';
+  preTypedText = '';
 }
 
 function submitText() {
@@ -550,16 +606,23 @@ function submitText() {
 
   stopCamera();
 
+  // Handle clarify visual answer flow
+  if (window._isClarifyVisual && window._onVisualAnswerComplete) {
+    window._isClarifyVisual = false;
+    window._onVisualAnswerComplete(text, capturedFrames.slice());
+    return;
+  }
+
   if (isUpdateMode) {
     submitUpdate(text || 'No additional text provided');
     return;
   }
 
   if (hasFrames) {
-    // Vision diagnosis - works with text, frames, or both
+    originalFrames = capturedFrames.slice();
     processWithVision(text || 'No verbal description provided');
   } else {
-    // Text-only diagnosis
+    originalFrames = [];
     processTranscript(text);
   }
 }
@@ -567,20 +630,39 @@ function submitText() {
 // CAMERA
 async function startCamera() {
   const ph = document.getElementById('camera-placeholder');
+  const ct = document.querySelector('.camera-off-text');
   if (ph) ph.style.display = 'flex';
+  if (ct) ct.textContent = 'Camera loading...';
   try {
+    // iOS Safari needs explicit camera permission separate from mic
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode:'environment', width:{ideal:1280}, height:{ideal:720} },
+      video: { facingMode:{exact:'environment'}, width:{ideal:1280}, height:{ideal:720} },
       audio: false
     });
     cameraStream = stream;
     const video = document.getElementById('camera-feed');
     video.srcObject = stream;
+    video.setAttribute('playsinline','');
+    video.setAttribute('autoplay','');
+    video.muted = true;
     await video.play();
     if (ph) ph.style.display = 'none';
   } catch(e) {
-    const t = document.querySelector('.camera-off-text');
-    if (t) t.textContent = 'Camera unavailable';
+    // Try without exact facingMode constraint (some devices need this)
+    try {
+      const stream2 = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode:'environment' },
+        audio: false
+      });
+      cameraStream = stream2;
+      const video = document.getElementById('camera-feed');
+      video.srcObject = stream2;
+      video.muted = true;
+      await video.play();
+      if (ph) ph.style.display = 'none';
+    } catch(e2) {
+      if (ct) ct.textContent = 'Camera unavailable -- tap Diagnose to continue with text/audio only';
+    }
   }
 }
 
@@ -612,35 +694,31 @@ function captureFrame() {
 
 // API CALLS
 async function processTranscript(transcript) {
-  showScreen('screen-processing');
-  document.getElementById('processing-steps-text').style.display='';
-  document.getElementById('vision-progress').style.display='none';
-  document.getElementById('processing-label').textContent='Diagnosing issue...';
+  originalTranscript = transcript;
+  originalFrames = [];
+  showProcessingScreen(false);
   animateProcessingSteps();
   try {
-    const task = await apiFetch('/done/diagnose', {
+    const result = await apiFetch('/done/diagnose', {
       method:'POST',
       body:JSON.stringify({transcript, property_id:PROPERTY_ID})
     });
-    task.status = 'open';
-    tasks.unshift(task);
-    saveCache();
-    activeTaskId = task.id;
-    setTimeout(() => { showScreen('screen-tasks'); setTimeout(()=>openDetail(task.id),300); }, 600);
+    handleDiagnosisResult(result);
   } catch(err) {
     showScreen('screen-record');
-    showToast('Could not diagnose -- '+( err.message||'please try again'), true);
+    showToast('Could not diagnose -- '+(err.message||'please try again'), true);
   }
 }
 
 async function processWithVision(transcript) {
+  originalTranscript = transcript;
   showScreen('screen-processing');
-  // Show vision progress UI
   document.getElementById('processing-steps-text').style.display='none';
   document.getElementById('vision-progress').style.display='flex';
   document.getElementById('processing-label').textContent='Analyzing recording...';
   
-  const frames = capturedFrames.slice(); // copy before reset
+  const frames = originalFrames.length > 0 ? originalFrames : capturedFrames.slice();
+  originalFrames = frames;
   const totalFrames = frames.length;
   
   // Animate progress bar while waiting
@@ -664,7 +742,7 @@ async function processWithVision(transcript) {
   }, 300);
 
   try {
-    const task = await apiFetch('/done/diagnose-vision', {
+    const result = await apiFetch('/done/diagnose-vision', {
       method:'POST',
       body:JSON.stringify({
         transcript,
@@ -676,16 +754,10 @@ async function processWithVision(transcript) {
         }))
       })
     });
-    
     clearInterval(progressInterval);
     progressEl.style.width = '100%';
     progressSub.textContent = 'Done!';
-    
-    task.status = 'open';
-    tasks.unshift(task);
-    saveCache();
-    activeTaskId = task.id;
-    setTimeout(() => { showScreen('screen-tasks'); setTimeout(()=>openDetail(task.id),300); }, 800);
+    setTimeout(() => handleDiagnosisResult(result), 400);
   } catch(err) {
     clearInterval(progressInterval);
     showScreen('screen-record');
@@ -724,6 +796,131 @@ function animateProcessingSteps() {
     el.classList.remove('visible','done');
     setTimeout(()=>{ el.classList.add('visible'); if(i>0) document.getElementById(steps[i-1]).classList.add('done'); }, i*700+200);
   });
+}
+
+
+// =======================================
+// DIAGNOSIS RESULT HANDLER
+// =======================================
+function showProcessingScreen(isVision) {
+  showScreen('screen-processing');
+  const stepsEl = document.getElementById('processing-steps-text');
+  const visionEl = document.getElementById('vision-progress');
+  const pl = document.getElementById('processing-label');
+  if (stepsEl) stepsEl.style.display = isVision ? 'none' : '';
+  if (visionEl) visionEl.style.display = isVision ? 'flex' : 'none';
+  if (pl) pl.textContent = isVision ? 'Analyzing recording...' : 'Diagnosing issue...';
+}
+
+function handleDiagnosisResult(result) {
+  if (result.needs_clarification && result.questions && result.questions.length > 0) {
+    pendingQuestions = result.questions;
+    clarifyAnswers = {};
+    window._clarifyFrames = {};
+    renderClarifyScreen();
+    showScreen('screen-clarify');
+  } else {
+    saveFinalTask(result);
+  }
+}
+
+function renderClarifyScreen() {
+  const container = document.getElementById('clarify-questions');
+  container.innerHTML = pendingQuestions.map((q, qi) => {
+    if (q.type === 'choice') {
+      const choices = q.options.map(opt =>
+        `<button class="clarify-choice-btn" onclick="selectChoice(${qi},'${opt.replace(/'/g,"\'")})" id="choice-${qi}-${qi}_${opt.replace(/[^a-z0-9]/gi,'_')}">${esc(opt)}</button>`
+      ).join('');
+      return `<div class="clarify-question"><div class="clarify-q-text">${esc(q.text)}</div><div class="clarify-choices" id="choices-${qi}">${choices}</div></div>`;
+    } else {
+      return `<div class="clarify-question"><div class="clarify-q-text">${esc(q.text)}</div><div id="visual-status-${qi}"><button class="clarify-visual-btn" onclick="recordVisualAnswer(${qi})">&#x1F4F9; Record Visual Response</button></div></div>`;
+    }
+  }).join('');
+}
+
+function selectChoice(qi, value) {
+  clarifyAnswers['q'+qi] = value;
+  const choices = document.getElementById('choices-'+qi);
+  if (choices) {
+    choices.querySelectorAll('.clarify-choice-btn').forEach(b => b.classList.remove('selected'));
+    choices.querySelectorAll('.clarify-choice-btn').forEach(b => {
+      if (b.textContent === value) b.classList.add('selected');
+    });
+  }
+}
+
+function recordVisualAnswer(qi) {
+  window._visualAnswerQi = qi;
+  window._onVisualAnswerComplete = (transcript, frames) => {
+    clarifyAnswers['q'+qi] = {type:'visual', transcript, frameCount: frames.length};
+    if (!window._clarifyFrames) window._clarifyFrames = {};
+    window._clarifyFrames[qi] = frames;
+    const statusEl = document.getElementById('visual-status-'+qi);
+    if (statusEl) {
+      const preview = transcript.slice(0,50) + (transcript.length>50?'...':'');
+      statusEl.innerHTML = `<div class="clarify-visual-answered">&#x2713; Recorded: "${preview}" (${frames.length} frames)</div><button class="clarify-visual-btn" style="margin-top:8px" onclick="recordVisualAnswer(${qi})">&#x1F4F9; Re-record</button>`;
+    }
+    showScreen('screen-clarify');
+  };
+  window._isClarifyVisual = true;
+  showRecordScreen(false);
+}
+
+async function submitWithAnswers(skip) {
+  let combined = originalTranscript;
+  if (!skip && Object.keys(clarifyAnswers).length > 0) {
+    combined += '. Additional context: ';
+    pendingQuestions.forEach((q, qi) => {
+      const ans = clarifyAnswers['q'+qi];
+      if (ans) {
+        combined += typeof ans === 'string'
+          ? q.text + ': ' + ans + '. '
+          : q.text + ' (visual): ' + ans.transcript + '. ';
+      }
+    });
+  }
+  let allFrames = [...originalFrames];
+  if (window._clarifyFrames) {
+    Object.values(window._clarifyFrames).forEach(fs => { allFrames = allFrames.concat(fs); });
+  }
+  if (allFrames.length > 20) allFrames = allFrames.slice(0,20);
+  window._clarifyFrames = {};
+  pendingQuestions = [];
+  if (allFrames.length > 0) {
+    originalFrames = allFrames;
+    processWithVision(combined);
+  } else {
+    processTranscriptFinal(combined);
+  }
+}
+
+async function processTranscriptFinal(transcript) {
+  showProcessingScreen(false);
+  animateProcessingSteps();
+  try {
+    const result = await apiFetch('/done/diagnose', {
+      method:'POST',
+      body:JSON.stringify({transcript, property_id:PROPERTY_ID, final:true})
+    });
+    saveFinalTask(result);
+  } catch(err) {
+    showScreen('screen-record');
+    showToast('Could not diagnose -- '+(err.message||'please try again'), true);
+  }
+}
+
+function saveFinalTask(task) {
+  if (originalFrames.length > 0 && task.key_frame_indices) {
+    task.key_frames = task.key_frame_indices
+      .filter(i => i < originalFrames.length)
+      .slice(0,3)
+      .map((idx,n) => ({dataUrl: originalFrames[idx].dataUrl, caption: task.key_frame_captions ? task.key_frame_captions[n] || 'Issue detail' : 'Issue detail'}));
+  }
+  task.status = 'open';
+  tasks.unshift(task);
+  saveCache();
+  activeTaskId = task.id;
+  setTimeout(() => { showScreen('screen-tasks'); setTimeout(()=>openDetail(task.id),300); }, 600);
 }
 
 // TASK LIST
@@ -860,30 +1057,49 @@ async function emptyTrash() {
 function generateRFQ() {
   const task = tasks.find(t=>t.id===activeTaskId);
   if (!task) return;
-  const rfq = `REQUEST FOR QUOTE -- Home Repair
-Date: ${task.date}
-==============================
 
-ISSUE: ${task.title}
-PRIORITY: ${task.urgency_label}
-${task.safety_flag?'(!) SAFETY RISK -- Please prioritize | ':''}
-DESCRIPTION:
-${task.diagnosis}
+  const safetyNote = task.safety_flag
+    ? '<p style="color:#e05c5c;font-weight:bold;margin:12px 0">(!) SAFETY RISK -- Please prioritize.</p>'
+    : '';
 
-BUDGET ESTIMATE: $${task.cost_min}-$${task.cost_max}
+  const photosHtml = (task.key_frames && task.key_frames.length > 0)
+    ? '<h3 style="font-family:sans-serif;font-size:14px;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin:20px 0 12px">Supporting Photos</h3><div style="display:flex;gap:12px;flex-wrap:wrap">' +
+      task.key_frames.map(f =>
+        '<div style="flex:1;min-width:140px;max-width:200px"><img src="' + f.dataUrl + '" style="width:100%;border-radius:6px;border:1px solid #333"><p style="font-family:monospace;font-size:11px;color:#888;margin:6px 0 0;text-align:center">' + esc(f.caption) + '</p></div>'
+      ).join('') + '</div>'
+    : '';
 
-OWNER NOTES:
-"${task.transcript}"
+  const rfqHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RFQ - ' + esc(task.title) + '</title></head>'
+    + '<body style="font-family:sans-serif;max-width:640px;margin:40px auto;padding:0 24px;color:#111;background:#fff">'
+    + '<h1 style="font-size:22px;font-weight:800;margin-bottom:4px">Request for Quote</h1>'
+    + '<p style="color:#888;font-size:13px;margin-bottom:24px">Home Repair -- ' + esc(task.date) + '</p>'
+    + '<hr style="border:none;border-top:2px solid #eee;margin-bottom:24px">'
+    + '<table style="width:100%;border-collapse:collapse;margin-bottom:20px">'
+    + '<tr><td style="padding:6px 0;color:#888;font-size:12px;width:120px">ISSUE</td><td style="font-weight:700;font-size:16px">' + esc(task.title) + '</td></tr>'
+    + '<tr><td style="padding:6px 0;color:#888;font-size:12px">PRIORITY</td><td>' + esc(task.urgency_label) + '</td></tr>'
+    + '<tr><td style="padding:6px 0;color:#888;font-size:12px">BUDGET</td><td style="font-weight:700">$' + task.cost_min + '-$' + task.cost_max + ' <span style="font-weight:normal;color:#888;font-size:12px">(' + esc(task.cost_note||'') + ')</span></td></tr>'
+    + '</table>'
+    + safetyNote
+    + '<h3 style="font-size:14px;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin:20px 0 8px">Description</h3>'
+    + '<p style="line-height:1.6;margin-bottom:16px">' + esc(task.summary || task.diagnosis) + '</p>'
+    + photosHtml
+    + '<h3 style="font-size:14px;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin:24px 0 12px">Please provide a quote including</h3>'
+    + '<ul style="line-height:2;padding-left:20px"><li>Your assessment of the issue</li><li>Proposed fix and materials</li><li>Labour and parts cost breakdown</li><li>Estimated timeline</li><li>Availability for site visit</li></ul>'
+    + '<hr style="border:none;border-top:1px solid #eee;margin:24px 0">'
+    + '<p style="font-size:12px;color:#aaa">Generated by Done -- Home Maintenance App</p>'
+    + '</body></html>';
 
-Please provide a quote including:
-- Your diagnosis of the issue
-- Proposed fix and materials
-- Labour and parts cost breakdown
-- Estimated timeline
-- Availability for inspection
+  const textRFQ = 'REQUEST FOR QUOTE -- Home Repair\nDate: ' + task.date
+    + '\nISSUE: ' + task.title
+    + '\nPRIORITY: ' + task.urgency_label
+    + '\nBUDGET: $' + task.cost_min + '-$' + task.cost_max
+    + '\n\nDESCRIPTION:\n' + (task.summary || task.diagnosis)
+    + '\n\nPlease quote: assessment, fix, materials, cost breakdown, timeline, availability.'
+    + '\n\nThank you.';
 
-Thank you.`;
-  document.getElementById('rfq-content').textContent = rfq;
+  document.getElementById('rfq-content').textContent = textRFQ;
+  window._rfqHtml = rfqHtml;
+  window._rfqTitle = task.title;
   document.getElementById('rfq-modal').classList.add('open');
 }
 
@@ -891,8 +1107,23 @@ function closeModal() { document.getElementById('rfq-modal').classList.remove('o
 
 function copyRFQ() {
   navigator.clipboard.writeText(document.getElementById('rfq-content').textContent)
-    .then(()=>{ showToast('Copied &#x2713;'); closeModal(); })
+    .then(()=>{ showToast('Copied'); closeModal(); })
     .catch(()=>showToast('Select and copy the text above'));
+}
+
+function downloadRFQ() {
+  if (!window._rfqHtml) return;
+  const blob = new Blob([window._rfqHtml], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'RFQ-' + (window._rfqTitle||'repair').replace(/[^a-z0-9]/gi,'-') + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  closeModal();
+  showToast('RFQ saved');
 }
 
 // UTILS
