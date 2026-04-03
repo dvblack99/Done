@@ -193,9 +193,10 @@
 .clarify-body { padding:24px; display:flex; flex-direction:column; gap:24px; padding-bottom:40px; }
 .clarify-question { background:var(–surface); border:1px solid var(–border); border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:12px; }
 .clarify-q-text { font-family:‘Syne’,sans-serif; font-size:15px; font-weight:700; color:var(–text); line-height:1.4; }
-.clarify-choices { display:flex; flex-wrap:wrap; gap:8px; }
-.clarify-choice-btn { font-family:‘DM Mono’,monospace; font-size:12px; padding:8px 14px; border-radius:6px; border:1px solid var(–border); background:var(–surface2); color:var(–text); cursor:pointer; transition:all 0.15s; letter-spacing:0.03em; }
-.clarify-choice-btn.selected { border-color:var(–accent2); background:rgba(196,169,107,0.12); color:var(–accent); }
+.clarify-choices { display:flex; flex-direction:column; gap:6px; }
+.clarify-choice-btn { font-family:‘Syne’,sans-serif; font-size:14px; font-weight:600; padding:14px 18px; border-radius:8px; border:2px solid var(–border); background:var(–surface2); color:var(–text); cursor:pointer; transition:all 0.15s; width:100%; text-align:left; margin-bottom:2px; }
+.clarify-choice-btn:active { transform:scale(0.98); }
+.clarify-choice-btn.selected { border-color:var(–accent); background:rgba(232,213,163,0.12); color:var(–accent); }
 .clarify-visual-btn { display:flex; align-items:center; gap:10px; padding:14px 16px; border-radius:8px; border:1px solid #4a7a4a; background:#1a2a1a; color:var(–ok); font-family:‘Syne’,sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:transform 0.15s; width:100%; justify-content:center; }
 .clarify-visual-btn:active { transform:scale(0.97); }
 .clarify-visual-answered { font-family:‘DM Mono’,monospace; font-size:11px; color:var(–ok); display:flex; align-items:center; gap:6px; }
@@ -747,6 +748,7 @@ async function processWithVision(transcript) {
       body:JSON.stringify({
         transcript,
         property_id: PROPERTY_ID,
+        final: window._isFinalPass || false,
         frames: frames.map(f => ({
           timestamp: f.timestamp,
           dataUrl: f.dataUrl,
@@ -754,6 +756,7 @@ async function processWithVision(transcript) {
         }))
       })
     });
+    window._isFinalPass = false;
     clearInterval(progressInterval);
     progressEl.style.width = '100%';
     progressSub.textContent = 'Done!';
@@ -888,6 +891,7 @@ async function submitWithAnswers(skip) {
   pendingQuestions = [];
   if (allFrames.length > 0) {
     originalFrames = allFrames;
+    window._isFinalPass = true;
     processWithVision(combined);
   } else {
     processTranscriptFinal(combined);
